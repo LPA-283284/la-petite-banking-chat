@@ -48,7 +48,7 @@ calculated_till_balance = calculated_taken_in - (cc1 + cc2 + cc3 + amex1 +amex2+
 st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
 
 # Diğer bilgiler
-deposit = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", key="deposit1", value=None, placeholder="0.00", key="gross_total")
+deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
 tips_credit_card = st.number_input("Tips (CC) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 till_balance = st.number_input("Till Balance (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
