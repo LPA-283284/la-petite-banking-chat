@@ -37,6 +37,7 @@ amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f")
 # Diğer öğeler
 voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f")
 deposit = st.number_input("Kapora / Deposit (£)", min_value=0.0, format="%.2f")
+deposit = st.number_input("Kapora / Deposit (£)", min_value=0.0, format="%.2f")
 
 # Sipariş platformları
 deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f")
