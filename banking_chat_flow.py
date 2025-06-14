@@ -36,7 +36,6 @@ amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None,
 
 # Diğer öğeler
 voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
-deposit = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", key="deposit1", value=None, placeholder="0.00", key="gross_total")
 deposit = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", key="deposit2", value=None, placeholder="0.00", key="gross_total")
 
 # Sipariş platformları
@@ -44,13 +43,18 @@ Deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", valu
 Ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 Petty_Cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 
+# Otomatik Till Balance
+calculated_till_balance = calculated_taken_in - (cc1 + cc2 + cc3 + amex1 +amex2+ amex3 + voucher + deposit + deliveroo + Ubereats + Petty Cash)
+st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
+
 # Diğer bilgiler
-tips_cash = st.number_input("Tips (Cash) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
+deposit = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", key="deposit1", value=None, placeholder="0.00", key="gross_total")
+tips_credit_card = st.number_input("Tips (CC) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 till_balance = st.number_input("Till Balance (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
-float_val = st.number_input("Float (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
-total_hours = st.number_input("Toplam Çalışma Saati (Mutfak + Servis)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
+float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="0.00", key="gross_total")
+
 
 item_missing_kitchen = st.text_input("Mutfakta Eksik Olanlar")
 item_missing_floor = st.text_input("Serviste Eksik Olanlar")
