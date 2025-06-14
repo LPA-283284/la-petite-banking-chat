@@ -50,13 +50,13 @@ calculated_till_balance = (calculated_taken_in or 0.0) - (
 st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
 # Diğer metin alanları
-item_missing_kitchen = st.text_input("Mutfakta Eksik Olanlar")
-item_missing_floor = st.text_input("Serviste Eksik Olanlar")
+item_missing_kitchen = st.text_input("What's Missing in the Kitchen")
+item_missing_floor = st.text_input("What is missing in the service")
 eat_out = st.text_input("Eat Out to Help Out")
-comments = st.text_area("Müşteri Yorumları")
-manager = st.text_input("Yönetici")
-floor_staff = st.text_input("Servis Personeli")
-kitchen_staff = st.text_input("Mutfak Personeli")
+comments = st.text_area("Customer Reviews")
+manager = st.text_input("Manager")
+floor_staff = st.text_input("Service Personnel")
+kitchen_staff = st.text_input("Kitchen Staff")
 
 # Google Sheets bağlantısı
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
