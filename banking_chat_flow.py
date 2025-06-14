@@ -20,6 +20,7 @@ service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%
 discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
 complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
 staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
+calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc1")
 cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc2")
@@ -40,7 +41,7 @@ cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="0.00", key="float_val")
 
 # Hesaplamalar (None korumalı)
-calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
+
 calculated_till_balance = (calculated_taken_in or 0.0) - (
     (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
     (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
