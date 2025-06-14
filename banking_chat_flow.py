@@ -13,16 +13,13 @@ today = datetime.date.today()
 date = st.date_input("Date", today)
 
 # Satışlar ve ödemeler
-cash_total = st.number_input("Kasa Toplamı (£)", min_value=0.0, format="%.2f")
-gross_total = st.number_input("Brüt Satış Tutarı (£)", min_value=0.0, format="%.2f")
-net_total = st.number_input("Net Satış Tutarı (£)", min_value=0.0, format="%.2f")
-service_charge = st.number_input("Servis Ücreti (£)", min_value=0.0, format="%.2f")
-discount_total = st.number_input("Toplam İndirim (£)", min_value=0.0, format="%.2f")
-complimentary_total = st.number_input("İkramlar (£)", min_value=0.0, format="%.2f")
-staff_food = st.number_input("Personel Yemeği (£)", min_value=0.0, format="%.2f")
-
-total_taken_in = st.number_input("Toplam Alınan Tutar (£)", min_value=0.0, format="%.2f")
-total_final = st.number_input("Genel Toplam (£)", min_value=0.0, format="%.2f")
+gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f")
+net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f")
+service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f")
+discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f")
+complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f")
+staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f")
+total_taken_in = st.number_input("Taken_In (£)", min_value=0.0, format="%.2f")
 
 # Kredi kartları
 cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f")
