@@ -37,7 +37,6 @@ deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f
 tips_credit_card = st.number_input("Tips (CC) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
 tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
 cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_envelope")
-float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="0.00", key="float_val")
 
 # Hesaplamalar (None korumalı)
 
@@ -48,9 +47,8 @@ calculated_till_balance = (calculated_taken_in or 0.0) - (
     (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
 )
 
-
 st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
-
+float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="0.00", key="float_val")
 # Diğer metin alanları
 item_missing_kitchen = st.text_input("Mutfakta Eksik Olanlar")
 item_missing_floor = st.text_input("Serviste Eksik Olanlar")
