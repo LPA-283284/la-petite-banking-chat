@@ -5,7 +5,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
-st.title("La Petite Auberge - BANKING")
+st.title("LPA - BANKING")
 
 st.markdown("You can enter detailed banking information by filling in the fields below.")
 
