@@ -60,7 +60,10 @@ kitchen_staff = st.text_input("Mutfak Personeli")
 
 # Google Sheets bağlantısı
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-credentials = ServiceAccountCredentials.from_json_keyfile_name("google_sheets_credentials.json", scope)
+json_data = st.secrets["GOOGLE_SHEETS_CREDENTIALS"]
+info = json.loads(json_data)
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
+
 client = gspread.authorize(credentials)
 sheet = client.open("La Petite Banking Extended").sheet1
 
