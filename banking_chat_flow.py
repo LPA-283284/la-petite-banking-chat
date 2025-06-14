@@ -36,8 +36,6 @@ amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f")
 
 # Diğer öğeler
 voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f")
-tips_cash = st.number_input("Bahşiş (Nakit) (£)", min_value=0.0, format="%.2f")
-tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f")
 deposit = st.number_input("Kapora / Deposit (£)", min_value=0.0, format="%.2f")
 
 # Sipariş platformları
@@ -45,6 +43,8 @@ deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f")
 ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f")
 
 # Diğer bilgiler
+tips_cash = st.number_input("Bahşiş (Nakit) (£)", min_value=0.0, format="%.2f")
+tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f")
 till_balance = st.number_input("Kasadaki Para Miktarı (£)", min_value=0.0, format="%.2f")
 cash_envelope = st.number_input("Zarf içindeki Nakit (£)", min_value=0.0, format="%.2f")
 float_val = st.number_input("Float (£)", min_value=0.0, format="%.2f")
