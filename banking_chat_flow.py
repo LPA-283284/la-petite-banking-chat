@@ -40,14 +40,15 @@ deposit = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", ke
 deposit = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", key="deposit2")
 
 # Sipariş platformları
-deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f")
-ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f")
+Deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f")
+Ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f")
+Petty Cash = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f")
 
 # Diğer bilgiler
-tips_cash = st.number_input("Bahşiş (Nakit) (£)", min_value=0.0, format="%.2f")
+tips_cash = st.number_input("Tips (Cash) (£)", min_value=0.0, format="%.2f")
 tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f")
-till_balance = st.number_input("Kasadaki Para Miktarı (£)", min_value=0.0, format="%.2f")
-cash_envelope = st.number_input("Zarf içindeki Nakit (£)", min_value=0.0, format="%.2f")
+till_balance = st.number_input("Till Balance (£)", min_value=0.0, format="%.2f")
+cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f")
 float_val = st.number_input("Float (£)", min_value=0.0, format="%.2f")
 total_hours = st.number_input("Toplam Çalışma Saati (Mutfak + Servis)", min_value=0.0, format="%.2f")
 
