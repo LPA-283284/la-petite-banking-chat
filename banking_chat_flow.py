@@ -13,7 +13,7 @@ today = datetime.date.today()
 date = st.date_input("Date", today)
 
 # Satışlar ve ödemeler
-gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f")
+gross_total = st.number_input("Gross (£)", min_value=None, format="%.2f")
 net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f")
 service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f")
 discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f")
