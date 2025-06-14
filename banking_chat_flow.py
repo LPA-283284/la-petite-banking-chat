@@ -21,6 +21,9 @@ complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, forma
 staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f")
 total_taken_in = st.number_input("Taken_In (£)", min_value=0.0, format="%.2f")
 
+# Otomatik hesaplama
+calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
+
 # Kredi kartları
 cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f")
 cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f")
