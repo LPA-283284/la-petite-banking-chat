@@ -19,13 +19,10 @@ service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%
 discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f")
 complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f")
 staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f")
-total_taken_in = st.number_input("Taken_In (£)", min_value=0.0, format="%.2f")
 
 # Otomatik hesaplama
 calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
-
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
-
 total_taken_in = st.number_input("Taken_In (£)", value=calculated_taken_in, format="%.2f")
 
 # Kredi kartları
