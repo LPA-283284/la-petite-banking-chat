@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-
+import json
 st.set_page_config(page_title="Banking Genişlemiş Giriş", page_icon="📊")
 st.title("La Petite Auberge - Genişlemiş Banking Formu")
 
