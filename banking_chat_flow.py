@@ -44,7 +44,7 @@ Ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value
 Petty_Cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 
 # Otomatik Till Balance
-calculated_till_balance = calculated_taken_in - (cc1 + cc2 + cc3 + amex1 +amex2+ amex3 + voucher + deposit + deliveroo + Ubereats + Petty Cash)
+calculated_till_balance = calculated_taken_in - (cc1 + cc2 + cc3 + amex1 +amex2+ amex3 + voucher + deposit + deliveroo + ubereats + Petty_Cash)
 st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
 
 # Diğer bilgiler
