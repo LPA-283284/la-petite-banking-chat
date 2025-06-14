@@ -36,7 +36,7 @@ amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None,
 
 # Diğer öğeler
 voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
-deposit = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", key="deposit2", value=None, placeholder="0.00", key="gross_total")
+deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_minus")
 
 # Sipariş platformları
 Deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
