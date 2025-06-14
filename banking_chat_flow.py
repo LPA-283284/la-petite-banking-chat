@@ -42,7 +42,7 @@ deposit = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", ke
 # Sipariş platformları
 Deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f")
 Ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f")
-Petty Cash = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f")
+Petty_Cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f")
 
 # Diğer bilgiler
 tips_cash = st.number_input("Tips (Cash) (£)", min_value=0.0, format="%.2f")
