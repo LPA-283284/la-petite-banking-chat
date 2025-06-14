@@ -4,13 +4,13 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json
-st.set_page_config(page_title="Banking Genişlemiş Giriş", page_icon="📊")
-st.title("La Petite Auberge - Genişlemiş Banking Formu")
+st.set_page_config(page_title="LPA Banking", page_icon="📊")
+st.title("La Petite Auberge - BANKING")
 
-st.markdown("Aşağıdaki alanları doldurarak detaylı banking bilgilerini girebilirsiniz.")
+st.markdown("You can enter detailed banking information by filling in the fields below.")
 
 today = datetime.date.today()
-date = st.date_input("Tarih", today)
+date = st.date_input("Date", today)
 
 # Satışlar ve ödemeler
 cash_total = st.number_input("Kasa Toplamı (£)", min_value=0.0, format="%.2f")
