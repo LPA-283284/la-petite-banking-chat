@@ -20,6 +20,7 @@ service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%
 discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
 complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
 staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
+st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc1")
 cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc2")
 cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc3")
@@ -47,7 +48,7 @@ calculated_till_balance = (calculated_taken_in or 0.0) - (
     (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
 )
 
-st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
+
 st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
 
 # Diğer metin alanları
