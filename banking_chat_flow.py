@@ -46,7 +46,7 @@ petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", ke
 tips_credit_card = st.number_input("Tips (CC) (£)", min_value=0.0, format="%.2f", key="tips_credit_card")
 tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", key="tips_sc")
 cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", key="cash_envelope")
-float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", key="float_val")
+float_val = st.number_input("Float (£)", min_value=0.0, format="%.2f", key="float_val")
 
 # Hesaplama: Till Balance
 calculated_till_balance = (calculated_taken_in or 0.0) - (
