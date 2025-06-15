@@ -63,9 +63,9 @@ json_data = st.secrets["GOOGLE_SHEETS_CREDENTIALS"]
 info = json.loads(json_data)
 credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
 client = gspread.authorize(credentials)
-sheet = client.open("La Petite Banking Extended").sheet1
+sheet = client.open("La Petite Banking Extended").BANKING
 
-if st.button("Verileri Gönder"):
+if st.button("Submit"):
     row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total, staff_food,
            calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher, deposit_plus, deposit_minus,
            deliveroo, ubereats, petty_cash, tips_credit_card, tips_sc, calculated_till_balance,
