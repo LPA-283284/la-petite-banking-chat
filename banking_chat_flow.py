@@ -76,6 +76,4 @@ if st.button("Submit"):
 
     sheet.append_row(row)
     st.success("Data successfully sent it!")
-    # Tüm girişleri sıfırla
-    st.session_state["form_submitted"] = True
-    st.rerun()  
+    
