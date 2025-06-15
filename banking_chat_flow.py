@@ -77,7 +77,7 @@ if st.button("Verileri Gönder"):
 
     sheet.append_row(row)
     st.success("Veriler Google Sheets'e başarıyla gönderildi!")
-    st.experimental_rerun()
+    st.rerun()
 
 
     sheet.append_row(row)
