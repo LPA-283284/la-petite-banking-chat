@@ -1,4 +1,6 @@
-
+if "form_submitted" in st.session_state and st.session_state.form_submitted:
+    st.session_state.clear()
+    st.rerun()
 import streamlit as st
 import datetime
 import pandas as pd
@@ -78,6 +80,7 @@ if st.button("Verileri Gönder"):
     sheet.append_row(row)
     st.success("Veriler Google Sheets'e başarıyla gönderildi!")
     # Tüm girişleri sıfırla
+    st.session_state["form_submitted"] = True
     st.session_state.clear()
     st.rerun()  
 
