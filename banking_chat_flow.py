@@ -75,6 +75,6 @@ if st.button("Submit"):
     sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("Data successfully sent it!")
 
-st.session_state.clear()
+    st.session_state.clear()
     st.rerun()
     
