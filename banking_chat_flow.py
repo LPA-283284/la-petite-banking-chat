@@ -72,7 +72,9 @@ if st.button("Submit"):
            cash_envelope, float_val, item_missing_kitchen, item_missing_floor, eat_out,
            comments, manager, floor_staff, kitchen_staff]
 
-    sheet.append_row(row)
+    sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("Data successfully sent it!")
 
+st.session_state.clear()
+    st.rerun()
     
