@@ -74,4 +74,4 @@ if st.button("Submit"):
            comments, manager, floor_staff, kitchen_staff]
 
     sheet.append_row(row)
-    st.success("Veriler Google Sheets'e başarıyla gönderildi!")
+    st.success("Data successfully sent it!")
