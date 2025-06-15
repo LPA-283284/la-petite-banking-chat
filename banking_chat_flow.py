@@ -81,7 +81,6 @@ if st.button("Verileri Gönder"):
     st.success("Veriler Google Sheets'e başarıyla gönderildi!")
     # Tüm girişleri sıfırla
     st.session_state["form_submitted"] = True
-    st.session_state.clear()
     st.rerun()  
 
 
