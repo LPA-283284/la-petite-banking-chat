@@ -52,6 +52,7 @@ float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=
 # Diğer metin alanları
 item_missing_kitchen = st.text_area("Deposits")
 item_missing_floor = st.text_area("Petty Cash")
+eat_out = st.text_input("Eat Out to Help Out")
 comments = st.text_area("Customer Reviews")
 manager = st.text_input("Manager")
 floor_staff = st.text_input("Service Personnel")
