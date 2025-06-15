@@ -50,9 +50,8 @@ calculated_till_balance = (calculated_taken_in or 0.0) - (
 st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
 # Diğer metin alanları
-item_missing_kitchen = st.text_area("What's Missing in the Kitchen")
-item_missing_floor = st.text_area("What is missing in the service")
-eat_out = st.text_input("Eat Out to Help Out")
+item_missing_kitchen = st.text_area("Deposits")
+item_missing_floor = st.text_area("Petty Cash")
 comments = st.text_area("Customer Reviews")
 manager = st.text_input("Manager")
 floor_staff = st.text_input("Service Personnel")
