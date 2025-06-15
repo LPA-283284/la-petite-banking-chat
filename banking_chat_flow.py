@@ -7,48 +7,41 @@ import json
 
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
 st.title("LPA - BANKING")
-
-# Sayfa yeniden yüklendiyse girişleri temizle
-if st.session_state.get("form_submitted"):
+if "form_submitted" in st.session_state and st.session_state.form_submitted:
     st.session_state.clear()
-    st.experimental_rerun()
-
+    st.rerun()
 st.markdown("You can enter detailed banking information by filling in the fields below.")
 
 today = datetime.date.today()
 date = st.date_input("Date", today)
 
 # Girişler
-gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", key="gross_total")
-net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", key="net_total")
-service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", key="service_charge")
-discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", key="discount_total")
-complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", key="complimentary_total")
-staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", key="staff_food")
-
-# Hesaplama: Taken In
+gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
+net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="net_total")
+service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="service_charge")
+discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
+complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
+staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
 calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
+cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc1")
+cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc2")
+cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc3")
+amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex1")
+amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex2")
+amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex3")
+voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="voucher")
+deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_minus")
+deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deliveroo")
+ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="ubereats")
+petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="petty_cash")
+deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
+tips_credit_card = st.number_input("Tips (CC) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
+tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
+cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_envelope")
 
-# Kartlar ve diğer gelirler
-cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", key="cc1")
-cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", key="cc2")
-cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", key="cc3")
-amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", key="amex1")
-amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", key="amex2")
-amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", key="amex3")
-voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", key="voucher")
-deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", key="deposit_minus")
-deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", key="deposit_plus")
-deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", key="deliveroo")
-ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", key="ubereats")
-petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", key="petty_cash")
-tips_credit_card = st.number_input("Tips (CC) (£)", min_value=0.0, format="%.2f", key="tips_credit_card")
-tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", key="tips_sc")
-cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", key="cash_envelope")
-float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", key="float_val")
+# Hesaplamalar (None korumalı)
 
-# Hesaplama: Till Balance
 calculated_till_balance = (calculated_taken_in or 0.0) - (
     (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
     (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
@@ -57,8 +50,8 @@ calculated_till_balance = (calculated_taken_in or 0.0) - (
 )
 
 st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
-
-# Diğer bilgiler
+float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
+# Diğer metin alanları
 item_missing_kitchen = st.text_area("Deposits")
 item_missing_floor = st.text_area("Petty Cash")
 eat_out = st.text_input("Eat Out to Help Out")
@@ -75,7 +68,7 @@ credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
 client = gspread.authorize(credentials)
 sheet = client.open("La Petite Banking Extended").sheet1
 
-# Gönderme
+
 if st.button("Submit"):
     row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
            staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
@@ -85,8 +78,7 @@ if st.button("Submit"):
            comments, manager, floor_staff, kitchen_staff]
 
     sheet.append_row(row)
-    st.success("✅ Data successfully sent to Google Sheets!")
-
-    # Formu sıfırla
+    st.success("Data successfully sent it!")
+    # Tüm girişleri sıfırla
     st.session_state["form_submitted"] = True
-    st.rerun()
+    st.rerun()  
