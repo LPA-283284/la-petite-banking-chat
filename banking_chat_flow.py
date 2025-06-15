@@ -89,4 +89,4 @@ if st.button("Submit"):
 
     # Formu sıfırla
     st.session_state["form_submitted"] = True
-    st.experimental_rerun()
+    
