@@ -63,7 +63,7 @@ json_data = st.secrets["GOOGLE_SHEETS_CREDENTIALS"]
 info = json.loads(json_data)
 credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
 client = gspread.authorize(credentials)
-sheet = client.open("La Petite Banking Extended").sheet1
+sheet = client.open("La Petite Banking Extended").BANKING
 
 
 if st.button("Submit"):
