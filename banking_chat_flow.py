@@ -64,19 +64,17 @@ info = json.loads(json_data)
 credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
 client = gspread.authorize(credentials)
 sheet = client.open("La Petite Banking Extended").sheet1
-sheet.append_row([
-    str(date), gross_total, net_total, service_charge,
-    discount_total, complimentary_total, staff_food,
-    calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3,
-    voucher, deposit_plus, deposit_minus, deliveroo,
-    ubereats, petty_cash, tips_credit_card, tips_sc,
-    calculated_till_balance, cash_envelope, float_val,
-    item_missing_kitchen, item_missing_floor, eat_out,
-    comments, manager, floor_staff, kitchen_staff
-], value_input_option="USER_ENTERED")
-
 
 if st.button("Submit"):
+    row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total, staff_food,
+           calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher, deposit_plus, deposit_minus,
+           deliveroo, ubereats, petty_cash, tips_credit_card, tips_sc, calculated_till_balance,
+           cash_envelope, float_val, item_missing_kitchen, item_missing_floor, eat_out,
+           comments, manager, floor_staff, kitchen_staff]
+
+    sheet.append_row(row)
+    st.success("Data successfully sent it!")
+    if st.button("Verileri Gönder"):
     row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
            staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
            deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
@@ -85,5 +83,5 @@ if st.button("Submit"):
            comments, manager, floor_staff, kitchen_staff]
 
     sheet.append_row(row)
-    st.success("Data successfully sent it!")
+    st.success("Veriler Google Sheets'e başarıyla gönderildi!")
     
