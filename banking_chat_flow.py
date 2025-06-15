@@ -7,9 +7,6 @@ import json
 
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
 st.title("LPA - BANKING")
-if "form_submitted" in st.session_state and st.session_state.form_submitted:
-    st.session_state.clear()
-    st.rerun()
 st.markdown("You can enter detailed banking information by filling in the fields below.")
 
 today = datetime.date.today()
