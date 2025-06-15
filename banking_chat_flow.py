@@ -70,7 +70,7 @@ client = gspread.authorize(credentials)
 sheet = client.open("La Petite Banking Extended").sheet1
 
 
-if st.button("Verileri Gönder"):
+if st.button("Submit"):
     row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
            staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
            deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
@@ -79,14 +79,12 @@ if st.button("Verileri Gönder"):
            comments, manager, floor_staff, kitchen_staff]
 
     sheet.append_row(row)
-    st.success("Veriler Google Sheets'e başarıyla gönderildi!")
+    st.success("Data successfully sent it!")
     # Tüm girişleri sıfırla
     st.session_state["form_submitted"] = True
     st.rerun()  
 
 
-    sheet.append_row(row)
-    st.success("Data successfully sent it!")
 
     # 🔁 Bu satır sayfayı sıfırlar:
     st.experimental_rerun()
