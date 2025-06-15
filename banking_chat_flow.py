@@ -77,8 +77,9 @@ if st.button("Verileri Gönder"):
 
     sheet.append_row(row)
     st.success("Veriler Google Sheets'e başarıyla gönderildi!")
+    # Tüm girişleri sıfırla
     st.session_state.clear()
-    st.rerun()
+    st.rerun()  
 
 
     sheet.append_row(row)
