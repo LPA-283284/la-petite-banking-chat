@@ -86,6 +86,5 @@ if st.button("Submit"):
 
 
 
-    # 🔁 Bu satır sayfayı sıfırlar:
-    st.experimental_rerun()
+    
 
