@@ -40,16 +40,25 @@ tips_credit_card = st.number_input("Tips (CC) (£)", min_value=0.0, format="%.2f
 tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
 cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_envelope")
 
-# Hesaplamalar (None korumalı)
-
-calculated_till_balance = (calculated_taken_in or 0.0) - (
+# Çıkarılacaklar
+deducted_items = (
     (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
     (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
-    (voucher or 0.0) + (deposit_plus or 0.0) +
+    (voucher or 0.0) + (deposit_minus or 0.0) +
     (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
 )
 
-st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
+# Eklenecekler
+added_items = (
+    (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
+)
+
+# Özel hesaplama
+remaining_custom = calculated_taken_in - deducted_items + added_items
+
+# Göster
+st.markdown(f"### 🧮 Final Adjusted Balance: £{remaining_custom:.2f}")
+
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
 # Diğer metin alanları
 item_missing_kitchen = st.text_area("Deposits")
