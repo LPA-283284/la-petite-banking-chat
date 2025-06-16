@@ -30,22 +30,21 @@ calculated_taken_in = gross_total - (discount_total + complimentary_total + staf
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
 # Ödemeler
-cc1 = st.number_input("CC 1 (£)", 0.0, format="%.2f")
-cc2 = st.number_input("CC 2 (£)", 0.0, format="%.2f")
-cc3 = st.number_input("CC 3 (£)", 0.0, format="%.2f")
-amex1 = st.number_input("Amex 1 (£)", 0.0, format="%.2f")
-amex2 = st.number_input("Amex 2 (£)", 0.0, format="%.2f")
-amex3 = st.number_input("Amex 3 (£)", 0.0, format="%.2f")
-voucher = st.number_input("Voucher (£)", 0.0, format="%.2f")
-deposit_minus = st.number_input("Deposit ( - ) (£)", 0.0, format="%.2f")
-deliveroo = st.number_input("Deliveroo (£)", 0.0, format="%.2f")
-ubereats = st.number_input("Uber Eats (£)", 0.0, format="%.2f")
-petty_cash = st.number_input("Petty Cash (£)", 0.0, format="%.2f")
-deposit_plus = st.number_input("Deposit ( + ) (£)", 0.0, format="%.2f")
-tips_sc = st.number_input("Servis Charge (£)", 0.0, format="%.2f")
-tips_credit_card = st.number_input("CC Tips (£)", 0.0, format="%.2f")
-cash_tips = st.number_input("Cash Tips (£)", 0.0, format="%.2f")
-float_val = st.number_input("Float (£)", min_value=75.0, format="%.2f", value=75.0)
+cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc1")
+cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc2")
+cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc3")
+amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex1")
+amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex2")
+amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex3")
+voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="voucher")
+deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_minus")
+deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deliveroo")
+ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="ubereats")
+petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="petty_cash")
+deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
+tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
+tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
+
 
 deducted_items = cc1 + cc2 + cc3 + amex1 + amex2 + amex3 + voucher + deposit_minus + deliveroo + ubereats + petty_cash
 added_items = deposit_plus + tips_credit_card + tips_sc
