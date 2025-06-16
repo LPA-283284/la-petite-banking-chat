@@ -29,7 +29,9 @@ complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, forma
 staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
 
 # Hesaplama: Taken In
-calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
+alculated_taken_in = (gross_total or 0.0) - (
+    (discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0)
+)
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
 # Ödeme yöntemleri
@@ -51,9 +53,11 @@ cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="
 float_val = st.number_input("Float (£)", min_value=75.0, format="%.2f", value=75.0, key="float_val")
 
 # Hesaplama: Till Balance
-calculated_till_balance = calculated_taken_in - (
-    cc1 + cc2 + cc3 + amex1 + amex2 + amex3 +
-    voucher + deposit_plus + deliveroo + ubereats + petty_cash
+calculated_till_balance = (calculated_taken_in or 0.0) - (
+    (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
+    (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
+    (voucher or 0.0) + (deposit_plus or 0.0) +
+    (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
 )
 st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
 
