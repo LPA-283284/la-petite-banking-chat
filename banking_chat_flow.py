@@ -68,25 +68,35 @@ st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (c
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
 # Fotoğraf yükleme ve Drive'a gönderme
-uploaded_file = st.file_uploader("📷 Upload Receipt or Photo", type=["jpg", "jpeg", "png"])
+# Fotoğraf yükleme ve Drive'a gönderme (tek alanda yapılır)
+uploaded_file = st.file_uploader("📷 Upload Receipt or Photo", type=["jpg", "jpeg", "png", "pdf"])
 photo_link = ""
+image_drive_url = ""
 
 if uploaded_file is not None:
+    scope = ["https://www.googleapis.com/auth/drive"]
     gauth = GoogleAuth()
-    gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, [
-        "https://www.googleapis.com/auth/drive"])
+    gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]), scope)
     drive = GoogleDrive(gauth)
+
+    # Dosyayı geçici olarak kaydet
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         temp_file.write(uploaded_file.read())
         temp_file_path = temp_file.name
 
-    gfile = drive.CreateFile({'title': uploaded_file.name})
-    gfile.SetContentFile(temp_file_path)
-    gfile.Upload()
-    gfile.InsertPermission({'type': 'anyone', 'value': 'anyone', 'role': 'reader'})
-    photo_link = f"https://drive.google.com/uc?id={gfile['id']}"
-    st.success("📸 Image uploaded to Google Drive!")
-    st.image(photo_link, caption="Uploaded Image", use_column_width=True)
+    # Drive'a yükle
+    file_drive = drive.CreateFile({'title': uploaded_file.name})
+    file_drive.SetContentFile(temp_file_path)
+    file_drive.Upload()
+    file_drive.InsertPermission({'type': 'anyone', 'value': 'anyone', 'role': 'reader'})
+    image_drive_url = file_drive['alternateLink']
+    photo_link = f"https://drive.google.com/uc?id={file_drive['id']}"
+
+    st.success("📤 Image uploaded to Google Drive!")
+    if uploaded_file.type.startswith("image/"):
+        st.image(photo_link, caption="Uploaded Image", use_column_width=True)
+    else:
+        st.markdown(f"[📄 View Uploaded File]({photo_link})")
 
 deposits = st.text_area("Deposits")
 petty_cash_note = st.text_area("Petty Cash")
@@ -125,11 +135,12 @@ if uploaded_file is not None:
     st.success("📤 Image uploaded to Google Drive!")
 
 if st.button("Send it"):
-    row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
-           staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
-           deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
-           tips_sc, remaining_custom, float_val, deposits, petty_cash_note, eat_out,
-           comments, manager, floor_staff, kitchen_staff, photo_link, image_drive_url,]
+    row = [
+    str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
+    staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
+    deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
+    tips_sc, remaining_custom, float_val, deposits, petty_cash_note, eat_out,
+    comments, manager, floor_staff, kitchen_staff, photo_link, image_drive_url
 
     sheet.append_row(row)
     st.success("Data successfully sent it!")
