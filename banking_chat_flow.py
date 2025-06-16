@@ -65,7 +65,8 @@ st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (c
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
 
-# Görsel yükleme
+import time  # mutlaka en başa ekle
+
 uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 photo_links = []
 
@@ -77,23 +78,25 @@ if uploaded_files:
     drive_service = build('drive', 'v3', credentials=creds_drive)
 
     for uploaded_file in uploaded_files:
+        # 📤 Dosyayı yükle
         media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
         uploaded = drive_service.files().create(
             body={'name': uploaded_file.name}, media_body=media, fields='id'
         ).execute()
 
-        # 🔐 HER DOSYA İÇİN PAYLAŞIM İZNİ VER
+        # ⏱ YÜKLEME SONRASI BEKLEME — önemli
+        time.sleep(1)
+
+        # 🔓 Herkese açık paylaşım izni ver
         drive_service.permissions().create(
             fileId=uploaded['id'],
             body={'type': 'anyone', 'role': 'reader'}
         ).execute()
 
-        # ✅ BEKLEME ZORUNLU DEĞİL AMA STABILİTE İÇİN FAYDALI
-        import time
-        time.sleep(0.3)
-
+        # 🔗 Link oluştur
         photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
         photo_links.append(photo_link)
+
         st.success(f"📸 Uploaded: {uploaded_file.name}")
         st.image(photo_link)
 # Ek alanlar
