@@ -90,6 +90,16 @@ if uploaded_files:
         st.success(f"📸 Uploaded: {uploaded_file.name}")
         st.image(photo_link)
 
+# Ek alanlar
+deposits = st.text_area("Deposits")
+petty_cash_note = st.text_area("Petty Cash")
+eat_out = st.text_input("Eat Out to Help Out")
+comments = st.text_area("Customer Reviews")
+manager = st.text_input("Manager")
+floor_staff = st.text_input("Service Personnel")
+kitchen_staff = st.text_input("Kitchen Staff")
+
+
 # Verileri gönder butonu
 if st.button("Submit"):
     # BANKING sayfasına veri gönder
