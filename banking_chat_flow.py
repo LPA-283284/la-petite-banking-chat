@@ -116,7 +116,10 @@ if st.button("Submit"):
     st.success("✅ Data successfully sent!")
 
     # 🔁 Giriş alanlarını sıfırla
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
+    for key in st.session_state.keys():
+        if isinstance(st.session_state[key], (int, float)):
+            st.session_state[key] = 0.0
+        elif isinstance(st.session_state[key], str):
+            st.session_state[key] = ""
 
     st.rerun()
