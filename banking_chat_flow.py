@@ -68,21 +68,30 @@ st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_cre
 # Görsel yükleme
 uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 photo_links = []
+
 if uploaded_files:
     creds_drive = Credentials.from_service_account_info(
         json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
         scopes=["https://www.googleapis.com/auth/drive"]
     )
     drive_service = build('drive', 'v3', credentials=creds_drive)
+
     for uploaded_file in uploaded_files:
         media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
         uploaded = drive_service.files().create(
             body={'name': uploaded_file.name}, media_body=media, fields='id'
         ).execute()
+
+        # 🔐 HER DOSYA İÇİN PAYLAŞIM İZNİ VER
         drive_service.permissions().create(
             fileId=uploaded['id'],
             body={'type': 'anyone', 'role': 'reader'}
         ).execute()
+
+        # ✅ BEKLEME ZORUNLU DEĞİL AMA STABILİTE İÇİN FAYDALI
+        import time
+        time.sleep(0.3)
+
         photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
         photo_links.append(photo_link)
         st.success(f"📸 Uploaded: {uploaded_file.name}")
