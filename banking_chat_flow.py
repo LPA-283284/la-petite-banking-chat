@@ -53,7 +53,7 @@ deducted_items = (
     (voucher or 0.0) + (deposit_minus or 0.0) +
     (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
 )
-added_items = deposit_plus + tips_credit_card + tips_sc
+added_items = (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
 remaining_custom = calculated_taken_in - deducted_items + added_items
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
