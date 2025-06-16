@@ -102,4 +102,4 @@ if submitted:
             images_sheet = sheet.add_worksheet(title="IMAGES", rows="100", cols="20")
         images_sheet.append_row(photo_links, value_input_option="USER_ENTERED")
 
-    st.success("✅ All information and images sent successfully!")
+    st.success("All information and images sent successfully!")
