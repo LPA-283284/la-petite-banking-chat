@@ -64,7 +64,24 @@ st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
+with st.form("banking_form"):
+    gross_total = st.text_input("Gross (£)", key="gross_total")
+    net_total = st.text_input("Net (£)", key="net_total")
+    service_charge = st.text_input("Service Charge (£)", key="service_charge")
+    # Diğer tüm text_input, number_input ve file uploader dahil...
 
+    deposits = st.text_area("Deposits")
+    petty_cash_note = st.text_area("Petty Cash")
+    eat_out = st.text_input("Eat Out to Help Out")
+    comments = st.text_area("Customer Reviews")
+    manager = st.text_input("Manager")
+    floor_staff = st.text_input("Service Personnel")
+    kitchen_staff = st.text_input("Kitchen Staff")
+
+    uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
+
+    submitted = st.form_submit_button("Submit")
+    
 # Görsel yükleme (çoklu ve ayrı sheet'e ayrı hücre olarak)
 uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 photo_links = []
@@ -89,15 +106,6 @@ if uploaded_files:
         photo_links.append(photo_link)
         st.success(f"📸 Uploaded: {uploaded_file.name}")
         st.image(photo_link)
-
-# Ek alanlar
-deposits = st.text_area("Deposits")
-petty_cash_note = st.text_area("Petty Cash")
-eat_out = st.text_input("Eat Out to Help Out")
-comments = st.text_area("Customer Reviews")
-manager = st.text_input("Manager")
-floor_staff = st.text_input("Service Personnel")
-kitchen_staff = st.text_input("Kitchen Staff")
 
 
 # Verileri gönder butonu
