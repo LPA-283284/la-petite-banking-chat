@@ -99,9 +99,9 @@ if submitted:
     staff_food or "", calculated_taken_in or "", cc1 or "", cc2 or "", cc3 or "", amex1 or "", amex2 or "", amex3 or "", voucher or "",
     deposit_plus or "", deposit_minus or "", deliveroo or "", ubereats or "", petty_cash or "", tips_credit_card or "",
     tips_sc or "", remaining_custom or "", float_val or "",
-    deposits, petty_cash_note, eat_out,
-    comments, manager, floor_staff, kitchen_staff
-] + (photo_links if photo_links else [])  # Görselleri aynı satıra hücre hücre ekle
+    deposits or "", petty_cash_note or "", eat_out or "",
+    comments or "", manager or "", floor_staff or "", kitchen_staff or ""
+] + (photo_links if 'photo_links' in locals() and photo_links else [])  # Görselleri aynı satıra hücre hücre ekle
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("✅ All information and images sent successfully!")
