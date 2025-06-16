@@ -56,16 +56,11 @@ remaining_custom = calculated_taken_in - deducted_items + added_items
 float_val = st.number_input("Float (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.0", key="float_val")
 cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_tips")
 
-st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
+st.markdown(f"### 🧲 Till Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
 with st.form("banking_form"):
-    gross_total = st.text_input("Gross (£)", key="gross_total")
-    net_total = st.text_input("Net (£)", key="net_total")
-    service_charge = st.text_input("Service Charge (£)", key="service_charge")
-    # Diğer tüm text_input, number_input...
-
     deposits = st.text_area("Deposits")
     petty_cash_note = st.text_area("Petty Cash")
     eat_out = st.text_input("Eat Out to Help Out")
@@ -74,50 +69,56 @@ with st.form("banking_form"):
     floor_staff = st.text_input("Service Personnel")
     kitchen_staff = st.text_input("Kitchen Staff")
 
-    # ✅ SADECE BU KALDI — Fotoğraflar burada yükleniyor
     uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
     submitted = st.form_submit_button("Submit")
 
-photo_links = []
-if uploaded_files:
-    creds_drive = Credentials.from_service_account_info(
-        json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
-        scopes=["https://www.googleapis.com/auth/drive"]
-    )
-    drive_service = build('drive', 'v3', credentials=creds_drive)
+    if submitted:
+        # Google Sheets baglantisi
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
+        client = gspread.authorize(creds)
 
-    for uploaded_file in uploaded_files:
-        media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
-        uploaded = drive_service.files().create(
-            body={'name': uploaded_file.name},
-            media_body=media,
-            fields='id'
-        ).execute()
-        photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
-        photo_links.append(photo_link)
-        st.success(f"📸 Uploaded: {uploaded_file.name}")
-        st.image(photo_link)
+        # BANKING sayfasına veri gönder
+        banking_row = [
+            str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
+            staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
+            deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
+            tips_sc, remaining_custom, float_val,
+            deposits, petty_cash_note, eat_out,
+            comments, manager, floor_staff, kitchen_staff
+        ]
+        sheet = client.open("La Petite Banking Extended")
+        banking_sheet = sheet.worksheet("BANKING")
+        banking_sheet.append_row(banking_row, value_input_option="USER_ENTERED")
 
+        # Fotoğrafları Google Drive'a yükle ve linkleri IMAGES sayfasına yaz
+        photo_links = []
+        if uploaded_files:
+            creds_drive = Credentials.from_service_account_info(info, scopes=["https://www.googleapis.com/auth/drive"])
+            drive_service = build('drive', 'v3', credentials=creds_drive)
+            for uploaded_file in uploaded_files:
+                media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
+                uploaded = drive_service.files().create(
+                    body={'name': uploaded_file.name}, media_body=media, fields='id'
+                ).execute()
+                drive_service.permissions().create(
+                    fileId=uploaded['id'], body={'type': 'anyone', 'role': 'reader'}
+                ).execute()
+                photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
+                photo_links.append(photo_link)
 
-# Verileri gönder butonu
-if submitted:
-    sheet = client.open("La Petite Banking Extended")
-    banking_sheet = sheet.worksheet("BANKING")
-    banking_sheet.append_row(banking_row, value_input_option="USER_ENTERED")
+            # IMAGES sayfasına linkleri yaz
+            try:
+                images_sheet = sheet.worksheet("IMAGES")
+            except:
+                images_sheet = sheet.add_worksheet(title="IMAGES", rows="100", cols="20")
+            images_sheet.append_row(photo_links, value_input_option="USER_ENTERED")
 
-    # IMAGES sayfasına görselleri ayrı hücrelere gönder
-    if photo_links:
-        images_sheet = None
-        try:
-            images_sheet = sheet.worksheet("IMAGES")
-        except:
-            images_sheet = sheet.add_worksheet(title="IMAGES", rows="100", cols="20")
-        images_sheet.append_row(photo_links, value_input_option="USER_ENTERED")
+        st.success("✅ All information and images sent successfully!")
 
-    st.success("✅ All information and images sent successfully!")
-
-    # Formu sıfırla
-    for key in st.session_state.keys():
-        del st.session_state[key]
-    st.rerun()
+        # Formu sıfırla
+        for key in st.session_state.keys():
+            del st.session_state[key]
+        st.rerun()
