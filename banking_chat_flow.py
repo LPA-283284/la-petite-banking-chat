@@ -114,5 +114,9 @@ if st.button("Send it"):
     ]
     sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("✅ Data successfully sent!")
-    st.session_state["form_submitted"] = True
+
+    # 🔁 Giriş alanlarını sıfırla
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+
     st.rerun()
