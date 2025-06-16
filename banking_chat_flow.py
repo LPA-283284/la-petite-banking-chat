@@ -83,9 +83,10 @@ photo_links = []
 if uploaded_files:
     creds_drive = Credentials.from_service_account_info(
         json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
-        scopes=["https://www.googleapis.com/auth/drive"]
-    )
-    drive_service = build('drive', 'v3', credentials=creds_drive)
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
+        client = gspread.authorize(creds)
 
     for uploaded_file in uploaded_files:
         media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
