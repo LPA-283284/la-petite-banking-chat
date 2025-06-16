@@ -20,31 +20,31 @@ today = datetime.date.today()
 date = st.date_input("Date", today)
 
 gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="gross_total")
-net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="net_total")
-service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="service_charge")
-discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
-complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
-staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
+net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="net_total")
+service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="service_charge")
+discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="discount_total")
+complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="complimentary_total")
+staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="staff_food")
 
 
 calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
 # Ödemeler
-cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc1")
-cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc2")
-cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc3")
-amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex1")
-amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex2")
-amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex3")
-voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="voucher")
-deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_minus")
-deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deliveroo")
-ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="ubereats")
-petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="petty_cash")
-deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
-tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
-tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
+cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="cc1")
+cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="cc2")
+cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="cc3")
+amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="amex1")
+amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="amex2")
+amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="amex3")
+voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="voucher")
+deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="deposit_minus")
+deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="deliveroo")
+ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="ubereats")
+petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="petty_cash")
+deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="deposit_plus")
+tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="tips_credit_card")
+tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="tips_sc")
 
 
 deducted_items = (
@@ -56,8 +56,8 @@ deducted_items = (
 added_items = (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
 remaining_custom = calculated_taken_in - deducted_items + added_items
 
-float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
-cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_tips")
+float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=0.0, placeholder="75.00", key="float_val")
+cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="cash_tips")
 
 # Göster
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
