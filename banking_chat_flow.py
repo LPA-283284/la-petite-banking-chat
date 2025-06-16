@@ -1,11 +1,11 @@
 import streamlit as st
 import datetime
 import gspread
+import json
 from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
-from google.oauth2.service_account import Credentials
-import json
 
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
 st.title("LPA - BANKING")
@@ -13,44 +13,48 @@ st.title("LPA - BANKING")
 today = datetime.date.today()
 date = st.date_input("Date", today)
 
-# Form Başlangıcı
+# Sayısal alanlar
+def num(label, key):
+    return st.number_input(label, min_value=0.0, format="%.2f", value=None, placeholder="0.00", key=key)
+
+gross_total = num("Gross (£)", "gross_total")
+net_total = num("Net (£)", "net_total")
+service_charge = num("Service Charge (£)", "service_charge")
+discount_total = num("Discount (£)", "discount_total")
+complimentary_total = num("Complimentary (£)", "complimentary_total")
+staff_food = num("Staff Food (£)", "staff_food")
+
+calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
+st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
+
+cc1 = num("CC 1 (£)", "cc1")
+cc2 = num("CC 2 (£)", "cc2")
+cc3 = num("CC 3 (£)", "cc3")
+amex1 = num("Amex 1 (£)", "amex1")
+amex2 = num("Amex 2 (£)", "amex2")
+amex3 = num("Amex 3 (£)", "amex3")
+voucher = num("Voucher (£)", "voucher")
+deposit_minus = num("Deposit ( - ) (£)", "deposit_minus")
+deliveroo = num("Deliveroo (£)", "deliveroo")
+ubereats = num("Uber Eats (£)", "ubereats")
+petty_cash = num("Petty Cash (£)", "petty_cash")
+deposit_plus = num("Deposit ( + ) (£)", "deposit_plus")
+tips_sc = num("Servis Charge (£)", "tips_sc")
+tips_credit_card = num("CC Tips (£)", "tips_credit_card")
+
+deducted_items = sum(x or 0.0 for x in [cc1, cc2, cc3, amex1, amex2, amex3, voucher, deposit_minus, deliveroo, ubereats, petty_cash])
+added_items = sum(x or 0.0 for x in [deposit_plus, tips_sc, tips_credit_card])
+remaining_custom = calculated_taken_in - deducted_items + added_items
+
+float_val = num("Float (£)", "float_val")
+cash_tips = num("Cash Tips (£)", "cash_tips")
+
+st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
+st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
+st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
+
+# Form alanları
 with st.form("banking_form"):
-    gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00")
-    net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00")
-    service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00")
-    discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00")
-    complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00")
-    staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00")
-
-    calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
-    st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
-
-    cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None)
-    cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None)
-    cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None)
-    amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=None)
-    amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None)
-    amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None)
-    voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None)
-    deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None)
-    deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None)
-    ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None)
-    petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None)
-    deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None)
-    tips_sc = st.number_input("Service Charge Tips (£)", min_value=0.0, format="%.2f", value=None)
-    tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None)
-
-    deducted_items = sum(x or 0.0 for x in [cc1, cc2, cc3, amex1, amex2, amex3, voucher, deposit_minus, deliveroo, ubereats, petty_cash])
-    added_items = (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
-    remaining_custom = calculated_taken_in - deducted_items + added_items
-
-    float_val = st.number_input("Float (£)", min_value=0.0, format="%.2f", value=None)
-    cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None)
-
-    st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
-    st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
-    st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
-
     deposits = st.text_area("Deposits")
     petty_cash_note = st.text_area("Petty Cash")
     eat_out = st.text_input("Eat Out to Help Out")
@@ -58,12 +62,10 @@ with st.form("banking_form"):
     manager = st.text_input("Manager")
     floor_staff = st.text_input("Service Personnel")
     kitchen_staff = st.text_input("Kitchen Staff")
-
     uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
     submitted = st.form_submit_button("Submit")
 
-# Veriler gönderiliyor
 if submitted:
     # Google Sheets bağlantısı
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -73,40 +75,38 @@ if submitted:
     sheet = client.open("La Petite Banking Extended")
     banking_sheet = sheet.worksheet("BANKING")
 
-    # Drive upload
-    photo_links = []
-    if uploaded_files:
-        creds_drive = Credentials.from_service_account_info(
-            json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
-            scopes=["https://www.googleapis.com/auth/drive"]
-        )
-        drive_service = build('drive', 'v3', credentials=creds_drive)
-        for uploaded_file in uploaded_files:
-            media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
-            uploaded = drive_service.files().create(
-                body={'name': uploaded_file.name},
-                media_body=media,
-                fields='id'
-            ).execute()
-            drive_service.permissions().create(
-                fileId=uploaded['id'],
-                body={'type': 'anyone', 'role': 'reader'}
-            ).execute()
-            photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
-            photo_links.append(photo_link)
+    # Drive bağlantısı
+    creds_drive = Credentials.from_service_account_info(info, scopes=["https://www.googleapis.com/auth/drive"])
+    drive_service = build('drive', 'v3', credentials=creds_drive)
 
-    # Satırı gönder
+    # Görselleri yükle
+    photo_links = []
+    for uploaded_file in uploaded_files or []:
+        media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
+        uploaded = drive_service.files().create(
+            body={'name': uploaded_file.name}, media_body=media, fields='id'
+        ).execute()
+        drive_service.permissions().create(
+            fileId=uploaded['id'],
+            body={'type': 'anyone', 'role': 'reader'}
+        ).execute()
+        photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
+        photo_links.append(photo_link)
+
+    # Veriyi gönder
     row = [
         str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
         staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
         deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
-        tips_sc, remaining_custom, float_val, deposits, petty_cash_note, eat_out,
+        tips_sc, remaining_custom, float_val,
+        deposits, petty_cash_note, eat_out,
         comments, manager, floor_staff, kitchen_staff
-    ] + photo_links  # Görselleri ayrı hücre olarak ekle
+    ] + photo_links  # Görselleri aynı satıra hücre hücre ekle
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("✅ All information and images sent successfully!")
 
-    # Reset
-    st.session_state.clear()
+    # Formu sıfırla
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
     st.rerun()
