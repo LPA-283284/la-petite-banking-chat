@@ -67,6 +67,12 @@ cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", valu
 st.markdown(f"### 🧮 Final Adjusted Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 
+# Göster
+st.markdown(f"### 🧮 Final Adjusted Balance: £{remaining_custom:.2f}")
+st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
+st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
+
+
 deposits = st.text_area("Deposits")
 petty_cash_note = st.text_area("Petty Cash")
 eat_out = st.text_input("Eat Out to Help Out")
