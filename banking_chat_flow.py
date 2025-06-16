@@ -47,8 +47,8 @@ tips_sc = st.number_input("Service Charge (Tips) (£)", min_value=0.0, format="%
 cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=0.0)
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=75.00)
 
-# Adjusted Net Cash Flow calculation
-adjusted_net_cash_flow = (
+# Till Balance
+alculated_till_balance = (
     calculated_taken_in
     - cc1 - cc2 - cc3
     - amex1 - amex2 - amex3
@@ -56,14 +56,9 @@ adjusted_net_cash_flow = (
     - deliveroo - ubereats - petty_cash
     + deposit_plus + tips_credit_card + tips_sc
 )
-st.markdown(f"### 💼 Adjusted Net Cash Flow: £{adjusted_net_cash_flow:.2f}")
+st.markdown(f"### 💼 Till Balance: £{calculated_till_balance:.2f}")
 
-# Till Balance
-calculated_till_balance = calculated_taken_in - (
-    cc1 + cc2 + cc3 + amex1 + amex2 + amex3 +
-    voucher + deposit_plus + deliveroo + ubereats + petty_cash
-)
-st.markdown(f"### 🧾 Till Balance (Calculated): £{calculated_till_balance:.2f}")
+
 
 # Notes and text fields
 item_missing_kitchen = st.text_area("Deposits Note")
