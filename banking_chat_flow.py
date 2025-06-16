@@ -110,7 +110,7 @@ if st.button("Send it"):
         deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
         tips_sc, remaining_custom, float_val,
         deposits, petty_cash_note, eat_out,
-        comments, manager, floor_staff, kitchen_staff, join(photo_links)
+        comments, manager, floor_staff, kitchen_staff, ", ".join(photo_links)
     ]
     sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("✅ Data successfully sent!")
