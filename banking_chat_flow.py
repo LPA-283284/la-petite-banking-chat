@@ -61,17 +61,13 @@ remaining_custom = calculated_taken_in - deducted_items + added_items
 
 # Göster
 st.markdown(f"### 🧮 Final Adjusted Balance: £{remaining_custom:.2f}")
-
-# Göster
-st.markdown(f"### 🧮 Final Adjusted Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
-
 
 cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_envelope")
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
 cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_tips")
 deposits = st.text_area("Deposits")
-petty_cash = st.text_area("Petty Cash")
+petty_cash_note = st.text_area("Petty Cash")
 eat_out = st.text_input("Eat Out to Help Out")
 comments = st.text_area("Customer Reviews")
 manager = st.text_input("Manager")
@@ -92,7 +88,7 @@ if st.button("Send it"):
            staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
            deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
            tips_sc, remaining_custom, cash_envelope, float_val,
-           item_missing_kitchen, item_missing_floor, eat_out,
+           deposits, petty_cash_note, eat_out,
            comments, manager, floor_staff, kitchen_staff]
 
     sheet.append_row(row)
