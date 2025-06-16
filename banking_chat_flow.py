@@ -4,6 +4,9 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+import tempfile
 
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
 st.title("LPA - BANKING")
@@ -56,18 +59,34 @@ added_items = (
     (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
 )
 
-# Özel hesaplama
 remaining_custom = calculated_taken_in - deducted_items + added_items
-
-
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
 cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_tips")
 
-# Göster
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
+# Fotoğraf yükleme ve Drive'a gönderme
+uploaded_file = st.file_uploader("📷 Upload Receipt or Photo", type=["jpg", "jpeg", "png"])
+photo_link = ""
+
+if uploaded_file is not None:
+    gauth = GoogleAuth()
+    gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, [
+        "https://www.googleapis.com/auth/drive"])
+    drive = GoogleDrive(gauth)
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_file.write(uploaded_file.read())
+        temp_file_path = temp_file.name
+
+    gfile = drive.CreateFile({'title': uploaded_file.name})
+    gfile.SetContentFile(temp_file_path)
+    gfile.Upload()
+    gfile.InsertPermission({'type': 'anyone', 'value': 'anyone', 'role': 'reader'})
+    photo_link = f"https://drive.google.com/uc?id={gfile['id']}"
+    st.success("📸 Image uploaded to Google Drive!")
+    st.image(photo_link, caption="Uploaded Image", use_column_width=True)
 
 deposits = st.text_area("Deposits")
 petty_cash_note = st.text_area("Petty Cash")
@@ -77,7 +96,6 @@ manager = st.text_input("Manager")
 floor_staff = st.text_input("Service Personnel")
 kitchen_staff = st.text_input("Kitchen Staff")
 
-# Google Sheets bağlantısı
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 json_data = st.secrets["GOOGLE_SHEETS_CREDENTIALS"]
 info = json.loads(json_data)
@@ -85,14 +103,12 @@ credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
 client = gspread.authorize(credentials)
 sheet = client.open("La Petite Banking Extended").sheet1
 
-# Gönder butonu
 if st.button("Send it"):
     row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
            staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
            deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
-           tips_sc, remaining_custom, float_val,
-           deposits, petty_cash_note, eat_out,
-           comments, manager, floor_staff, kitchen_staff]
+           tips_sc, remaining_custom, float_val, deposits, petty_cash_note, eat_out,
+           comments, manager, floor_staff, kitchen_staff, photo_link]
 
     sheet.append_row(row)
     st.success("Data successfully sent it!")
