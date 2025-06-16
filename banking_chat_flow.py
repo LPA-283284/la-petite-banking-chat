@@ -41,6 +41,24 @@ deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f
 tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
 tips_credit_card = st.number_input("Tips (CC) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
 
+# Çıkarılacaklar
+deducted_items = (
+    (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
+    (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
+    (voucher or 0.0) + (deposit_minus or 0.0) +
+    (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
+)
+
+# Eklenecekler
+added_items = (
+    (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
+)
+
+# Özel hesaplama
+remaining_custom = calculated_taken_in - deducted_items + added_items
+
+# Göster
+st.markdown(f"### 🧮 Final Adjusted Balance: £{remaining_custom:.2f}")
 
 
 cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_envelope")
@@ -62,24 +80,7 @@ credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
 client = gspread.authorize(credentials)
 sheet = client.open("La Petite Banking Extended").sheet1
 
-# Çıkarılacaklar
-deducted_items = (
-    (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
-    (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
-    (voucher or 0.0) + (deposit_minus or 0.0) +
-    (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
-)
 
-# Eklenecekler
-added_items = (
-    (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
-)
-
-# Özel hesaplama
-remaining_custom = calculated_taken_in - deducted_items + added_items
-
-# Göster
-st.markdown(f"### 🧮 Final Adjusted Balance: £{remaining_custom:.2f}")
 if st.button("Send it"):
     row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
            staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
