@@ -90,6 +90,6 @@ if st.button("Send it"):
            comments, manager, floor_staff, kitchen_staff]
 
     sheet.append_row(row)
-    st.success("Veriler Google Sheets'e başarıyla gönderildi!")
+    st.success("Data successfully sent it!")
     st.session_state["form_submitted"] = True
     st.rerun()
