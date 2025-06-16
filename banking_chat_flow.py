@@ -118,7 +118,7 @@ if st.button("Submit"):
     # 🔁 Giriş alanlarını sıfırla
     for key in list(st.session_state.keys()):
         if isinstance(st.session_state[key], float):
-            st.session_state[key] = 0.0
+            st.session_state.pop(key, None)
         elif isinstance(st.session_state[key], str):
             st.session_state[key] = ""
         elif isinstance(st.session_state[key], int):
