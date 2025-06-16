@@ -67,8 +67,7 @@ st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
-# Fotoğraf yükleme ve Drive'a gönderme
-# Fotoğraf yükleme ve Drive'a gönderme (tek alanda yapılır)
+# Fotoğraf yükleme ve Google Drive’a gönderme
 uploaded_file = st.file_uploader("📷 Upload Receipt or Photo", type=["jpg", "jpeg", "png", "pdf"])
 photo_link = ""
 image_drive_url = ""
@@ -79,12 +78,10 @@ if uploaded_file is not None:
     gauth.credentials = ServiceAccountCredentials.from_json_keyfile_dict(json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]), scope)
     drive = GoogleDrive(gauth)
 
-    # Dosyayı geçici olarak kaydet
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         temp_file.write(uploaded_file.read())
         temp_file_path = temp_file.name
 
-    # Drive'a yükle
     file_drive = drive.CreateFile({'title': uploaded_file.name})
     file_drive.SetContentFile(temp_file_path)
     file_drive.Upload()
@@ -98,6 +95,7 @@ if uploaded_file is not None:
     else:
         st.markdown(f"[📄 View Uploaded File]({photo_link})")
 
+# Notlar
 deposits = st.text_area("Deposits")
 petty_cash_note = st.text_area("Petty Cash")
 eat_out = st.text_input("Eat Out to Help Out")
@@ -106,6 +104,7 @@ manager = st.text_input("Manager")
 floor_staff = st.text_input("Service Personnel")
 kitchen_staff = st.text_input("Kitchen Staff")
 
+# Google Sheets bağlantısı
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 json_data = st.secrets["GOOGLE_SHEETS_CREDENTIALS"]
 info = json.loads(json_data)
@@ -113,34 +112,13 @@ credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
 client = gspread.authorize(credentials)
 sheet = client.open("La Petite Banking Extended").sheet1
 
-# Fotoğraf yükleme
-uploaded_file = st.file_uploader("📷 Upload Banking Photo", type=["jpg", "jpeg", "png", "pdf"])
-image_drive_url = ""
-
-# Fotoğraf Google Drive’a yüklenecekse (gerekli kütüphane: pydrive)
-if uploaded_file is not None:
-    from pydrive.auth import GoogleAuth
-    from pydrive.drive import GoogleDrive
-    from io import BytesIO
-
-    # Yetkilendirme (mevcut kimlik bilgileri ile)
-    gauth = GoogleAuth()
-    gauth.credentials = credentials
-    drive = GoogleDrive(gauth)
-
-    file_drive = drive.CreateFile({'title': uploaded_file.name})
-    file_drive.SetContentString(uploaded_file.getvalue().decode("latin1") if uploaded_file.type != "application/pdf" else uploaded_file.getvalue().decode("latin1", errors="ignore"))
-    file_drive.Upload()
-    image_drive_url = file_drive['alternateLink']
-    st.success("📤 Image uploaded to Google Drive!")
-
+# Gönder butonu
 if st.button("Send it"):
-    row = [
-    str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
-    staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
-    deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
-    tips_sc, remaining_custom, float_val, deposits, petty_cash_note, eat_out,
-    comments, manager, floor_staff, kitchen_staff, photo_link, image_drive_url
+    row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
+           staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
+           deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
+           tips_sc, remaining_custom, float_val, deposits, petty_cash_note, eat_out,
+           comments, manager, floor_staff, kitchen_staff, photo_link, image_drive_url]
 
     sheet.append_row(row)
     st.success("Data successfully sent it!")
