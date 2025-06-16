@@ -21,12 +21,12 @@ today = datetime.date.today()
 date = st.date_input("Date", today)
 
 # Girişler
-gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
-net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="net_total")
-service_charge_main = st.number_input("Service Charge (Main) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="service_charge_main")
-discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
-complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
-staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
+gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="gross_total")
+net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="net_total")
+service_charge_main = st.number_input("Service Charge (Main) (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="service_charge_main")
+discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="discount_total")
+complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="complimentary_total")
+staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="staff_food")
 
 # Hesaplama: Taken In
 alculated_taken_in = (gross_total or 0.0) - (
@@ -35,9 +35,9 @@ alculated_taken_in = (gross_total or 0.0) - (
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
 # Ödeme yöntemleri
-cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", vvalue=None, placeholder="0.00", key="cc1")
+cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc1")
 cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc2")
-cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", vvalue=None, placeholder="0.00", key="cc3")
+cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc3")
 amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex1")
 amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex2")
 amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex3")
