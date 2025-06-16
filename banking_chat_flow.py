@@ -64,7 +64,7 @@ with st.form("banking_form"):
     gross_total = st.text_input("Gross (£)", key="gross_total")
     net_total = st.text_input("Net (£)", key="net_total")
     service_charge = st.text_input("Service Charge (£)", key="service_charge")
-    # Diğer tüm text_input, number_input ve file uploader dahil...
+    # Diğer tüm text_input, number_input...
 
     deposits = st.text_area("Deposits")
     petty_cash_note = st.text_area("Petty Cash")
@@ -74,14 +74,12 @@ with st.form("banking_form"):
     floor_staff = st.text_input("Service Personnel")
     kitchen_staff = st.text_input("Kitchen Staff")
 
+    # ✅ SADECE BU KALDI — Fotoğraflar burada yükleniyor
     uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
     submitted = st.form_submit_button("Submit")
-    
-# Görsel yükleme (çoklu ve ayrı sheet'e ayrı hücre olarak)
-uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
-photo_links = []
 
+photo_links = []
 if uploaded_files:
     creds_drive = Credentials.from_service_account_info(
         json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
