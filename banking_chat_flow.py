@@ -78,9 +78,9 @@ if submitted:
 
     # Google Sheets
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds_sheet = ServiceAccountCredentials.from_json_keyfile_dict(
-        json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]), scope)
-    client = gspread.authorize(creds_sheet)
+    info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
+    client = gspread.authorize(creds)
     sheet = client.open("La Petite Banking Extended")
 
     # Add to BANKING sheet
