@@ -47,7 +47,12 @@ tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", va
 tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
 
 
-deducted_items = cc1 + cc2 + cc3 + amex1 + amex2 + amex3 + voucher + deposit_minus + deliveroo + ubereats + petty_cash
+deducted_items = (
+    (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
+    (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
+    (voucher or 0.0) + (deposit_minus or 0.0) +
+    (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
+)
 added_items = deposit_plus + tips_credit_card + tips_sc
 remaining_custom = calculated_taken_in - deducted_items + added_items
 
