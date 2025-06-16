@@ -27,7 +27,7 @@ complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, forma
 staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
 
 
-calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
+calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
 # Ödemeler
