@@ -60,7 +60,6 @@ added_items = (
 remaining_custom = calculated_taken_in - deducted_items + added_items
 
 
-cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_envelope")
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
 cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_tips")
 
