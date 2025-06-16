@@ -22,11 +22,11 @@ date = st.date_input("Date", today)
 
 # Girişler
 gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", key="gross_total")
-net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", , key="net_total")
-service_charge_main = st.number_input("Service Charge (Main) (£)", min_value=0.0, format="%.2f", , key="service_charge_main")
-discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", , key="discount_total")
-complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", , key="complimentary_total")
-staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", , key="staff_food")
+net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", key="net_total")
+service_charge_main = st.number_input("Service Charge (Main) (£)", min_value=0.0, format="%.2f", key="service_charge_main")
+discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", key="discount_total")
+complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", key="complimentary_total")
+staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", key="staff_food")
 
 # Hesaplama: Taken In
 calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
