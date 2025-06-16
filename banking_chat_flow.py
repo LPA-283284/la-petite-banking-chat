@@ -90,7 +90,7 @@ if st.button("Send it"):
     row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
            staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
            deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
-           tips_sc, remaining_custom, cash_envelope, float_val,
+           tips_sc, remaining_custom, float_val,
            deposits, petty_cash_note, eat_out,
            comments, manager, floor_staff, kitchen_staff]
 
