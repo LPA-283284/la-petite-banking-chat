@@ -103,7 +103,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
 client = gspread.authorize(creds)
 sheet = client.open("La Petite Banking Extended").sheet1
 
-if st.button("Send it"):
+if st.button("Submit"):
     row = [
         str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
         staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
