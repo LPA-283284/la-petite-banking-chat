@@ -38,7 +38,6 @@ petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", va
 deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
 tips_credit_card = st.number_input("Tips (CC) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
 tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
-cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_envelope")
 
 # Çıkarılacaklar
 deducted_items = (
@@ -59,6 +58,7 @@ remaining_custom = calculated_taken_in - deducted_items + added_items
 # Göster
 st.markdown(f"### 🧮 Final Adjusted Balance: £{remaining_custom:.2f}")
 
+cash_envelope = st.number_input("Cash in Envelope (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_envelope")
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
 # Diğer metin alanları
 item_missing_kitchen = st.text_area("Deposits")
