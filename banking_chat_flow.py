@@ -65,8 +65,7 @@ st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (c
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
 
-import time  # mutlaka en başa ekle
-
+# Görsel yükleme (çoklu ve ayrı sheet'e ayrı hücre olarak)
 uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 photo_links = []
 
@@ -78,64 +77,46 @@ if uploaded_files:
     drive_service = build('drive', 'v3', credentials=creds_drive)
 
     for uploaded_file in uploaded_files:
-        # 📤 Dosyayı yükle
         media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
         uploaded = drive_service.files().create(
             body={'name': uploaded_file.name}, media_body=media, fields='id'
         ).execute()
-
-        # ⏱ YÜKLEME SONRASI BEKLEME — önemli
-        time.sleep(1)
-
-        # 🔓 Herkese açık paylaşım izni ver
         drive_service.permissions().create(
             fileId=uploaded['id'],
             body={'type': 'anyone', 'role': 'reader'}
         ).execute()
-
-        # 🔗 Link oluştur
         photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
         photo_links.append(photo_link)
-
         st.success(f"📸 Uploaded: {uploaded_file.name}")
         st.image(photo_link)
-# Ek alanlar
-deposits = st.text_area("Deposits")
-petty_cash_note = st.text_area("Petty Cash")
-eat_out = st.text_input("Eat Out to Help Out")
-comments = st.text_area("Customer Reviews")
-manager = st.text_input("Manager")
-floor_staff = st.text_input("Service Personnel")
-kitchen_staff = st.text_input("Kitchen Staff")
 
-# Sheets bağlantısı
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
-creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
-client = gspread.authorize(creds)
-sheet = client.open("La Petite Banking Extended").sheet1
-
+# Verileri gönder butonu
 if st.button("Submit"):
-    row = [
+    # BANKING sayfasına veri gönder
+    banking_row = [
         str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
         staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
         deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
         tips_sc, remaining_custom, float_val,
         deposits, petty_cash_note, eat_out,
-        comments, manager, floor_staff, kitchen_staff, ", ".join(photo_links)
+        comments, manager, floor_staff, kitchen_staff
     ]
-    sheet.append_row(row, value_input_option="USER_ENTERED")
-    st.success("✅ Data successfully sent!")
+    sheet = client.open("La Petite Banking Extended")
+    banking_sheet = sheet.worksheet("BANKING")
+    banking_sheet.append_row(banking_row, value_input_option="USER_ENTERED")
 
-    # 🔁 Giriş alanlarını sıfırla
-    for key in list(st.session_state.keys()):
-        if isinstance(st.session_state[key], float):
-            st.session_state.pop(key, None)
-        elif isinstance(st.session_state[key], str):
-            st.session_state[key] = ""
-        elif isinstance(st.session_state[key], int):
-            st.session_state[key] = 0
-        else:
-            del st.session_state[key]
+    # IMAGES sayfasına görselleri ayrı hücrelere gönder
+    if photo_links:
+        images_sheet = None
+        try:
+            images_sheet = sheet.worksheet("IMAGES")
+        except:
+            images_sheet = sheet.add_worksheet(title="IMAGES", rows="100", cols="20")
+        images_sheet.append_row(photo_links, value_input_option="USER_ENTERED")
 
+    st.success("✅ All information and images sent successfully!")
+
+    # Formu sıfırla
+    for key in st.session_state.keys():
+        del st.session_state[key]
     st.rerun()
