@@ -66,26 +66,27 @@ st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_cre
 
 
 # Görsel yükleme
-uploaded_file = st.file_uploader("📷 Upload Receipt or Photo", type=["jpg", "jpeg", "png", "pdf"])
-photo_link = ""
-if uploaded_file:
+uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
+photo_links = []
+if uploaded_files:
     creds_drive = Credentials.from_service_account_info(
         json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
         scopes=["https://www.googleapis.com/auth/drive"]
     )
     drive_service = build('drive', 'v3', credentials=creds_drive)
-    media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
-    uploaded = drive_service.files().create(
-        body={'name': uploaded_file.name}, media_body=media, fields='id'
-    ).execute()
-    drive_service.permissions().create(
-        fileId=uploaded['id'],
-        body={'type': 'anyone', 'role': 'reader'}
-    ).execute()
-    photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
-    st.success("📸 Image uploaded to Google Drive!")
-    st.image(photo_link)
-
+    for uploaded_file in uploaded_files:
+        media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
+        uploaded = drive_service.files().create(
+            body={'name': uploaded_file.name}, media_body=media, fields='id'
+        ).execute()
+        drive_service.permissions().create(
+            fileId=uploaded['id'],
+            body={'type': 'anyone', 'role': 'reader'}
+        ).execute()
+        photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
+        photo_links.append(photo_link)
+        st.success(f"📸 Uploaded: {uploaded_file.name}")
+        st.image(photo_link)
 # Ek alanlar
 deposits = st.text_area("Deposits")
 petty_cash_note = st.text_area("Petty Cash")
@@ -109,7 +110,7 @@ if st.button("Send it"):
         deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
         tips_sc, remaining_custom, float_val,
         deposits, petty_cash_note, eat_out,
-        comments, manager, floor_staff, kitchen_staff, photo_link
+        comments, manager, floor_staff, kitchen_staff, join(photo_links)
     ]
     sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("✅ Data successfully sent!")
