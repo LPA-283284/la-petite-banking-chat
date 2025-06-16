@@ -26,6 +26,7 @@ discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", 
 complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
 staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
 
+
 calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
