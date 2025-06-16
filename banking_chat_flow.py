@@ -4,6 +4,10 @@ import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import json
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+from google.oauth2.service_account import Credentials
+import io
 
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
 st.title("LPA - BANKING")
@@ -24,6 +28,7 @@ service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%
 discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
 complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
 staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
+
 
 calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
@@ -59,20 +64,31 @@ added_items = (
 # Özel hesaplama
 remaining_custom = calculated_taken_in - deducted_items + added_items
 
-float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
-cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_tips")
-
-# Göster
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
-# Fotoğraf yükleme
+# File uploader
 uploaded_file = st.file_uploader("📷 Upload Receipt or Photo", type=["jpg", "jpeg", "png", "pdf"])
-photo_note = ""
-if uploaded_file is not None:
-    st.image(uploaded_file, caption="Uploaded File Preview", use_column_width=True)
-    photo_note = uploaded_file.name
+
+photo_link = ""
+if uploaded_file:
+    creds = Credentials.from_service_account_info(json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
+        scopes=["https://www.googleapis.com/auth/drive"])
+    drive_service = build('drive', 'v3', credentials=creds)
+
+    file_metadata = {'name': uploaded_file.name}
+    media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
+    uploaded = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+
+    drive_service.permissions().create(
+        fileId=uploaded.get("id"),
+        body={"role": "reader", "type": "anyone"},
+    ).execute()
+
+    photo_link = f"https://drive.google.com/uc?id={uploaded.get('id')}"
+    st.success("📸 Image uploaded to Google Drive!")
+    st.image(photo_link)
 
 # Diğer bilgiler
 deposits = st.text_area("Deposits")
@@ -83,24 +99,23 @@ manager = st.text_input("Manager")
 floor_staff = st.text_input("Service Personnel")
 kitchen_staff = st.text_input("Kitchen Staff")
 
+
 # Google Sheets bağlantısı
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-json_data = st.secrets["GOOGLE_SHEETS_CREDENTIALS"]
-info = json.loads(json_data)
-credentials = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
-client = gspread.authorize(credentials)
+info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
+creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
+client = gspread.authorize(creds)
 sheet = client.open("La Petite Banking Extended").sheet1
 
-# Gönder butonu
 if st.button("Send it"):
-    row = [str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
-           staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
-           deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
-           tips_sc, remaining_custom, float_val,
-           deposits, petty_cash_note, eat_out,
-           comments, manager, floor_staff, kitchen_staff, photo_note]
-
-    sheet.append_row(row)
+    row = [
+        str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
+        staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
+        deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
+        tips_sc, remaining_custom, float_val, deposits, petty_cash_note, eat_out,
+        comments, manager, floor_staff, kitchen_staff, photo_link
+    ]
+    sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("Data successfully sent it!")
     st.session_state["form_submitted"] = True
     st.rerun()
