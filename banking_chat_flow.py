@@ -84,6 +84,7 @@ if uploaded_files:
     creds_drive = Credentials.from_service_account_info(
         json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        )
         info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
         creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
         client = gspread.authorize(creds)
