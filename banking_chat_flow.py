@@ -59,7 +59,6 @@ added_items = (
 # Özel hesaplama
 remaining_custom = calculated_taken_in - deducted_items + added_items
 
-
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
 cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_tips")
 
@@ -68,7 +67,14 @@ st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
+# Fotoğraf yükleme
+uploaded_file = st.file_uploader("📷 Upload Receipt or Photo", type=["jpg", "jpeg", "png", "pdf"])
+photo_note = ""
+if uploaded_file is not None:
+    st.image(uploaded_file, caption="Uploaded File Preview", use_column_width=True)
+    photo_note = uploaded_file.name
 
+# Diğer bilgiler
 deposits = st.text_area("Deposits")
 petty_cash_note = st.text_area("Petty Cash")
 eat_out = st.text_input("Eat Out to Help Out")
@@ -92,7 +98,7 @@ if st.button("Send it"):
            deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
            tips_sc, remaining_custom, float_val,
            deposits, petty_cash_note, eat_out,
-           comments, manager, floor_staff, kitchen_staff]
+           comments, manager, floor_staff, kitchen_staff, photo_note]
 
     sheet.append_row(row)
     st.success("Data successfully sent it!")
