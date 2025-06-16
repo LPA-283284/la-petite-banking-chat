@@ -95,13 +95,13 @@ if submitted:
 
     # Veriyi gönder
     row = [
-        str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
-        staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
-        deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
-        tips_sc, remaining_custom, float_val,
-        deposits, petty_cash_note, eat_out,
-        comments, manager, floor_staff, kitchen_staff
-    ] + photo_links  # Görselleri aynı satıra hücre hücre ekle
+    str(date), gross_total or "", net_total or "", service_charge or "", discount_total or "", complimentary_total or "",
+    staff_food or "", calculated_taken_in or "", cc1 or "", cc2 or "", cc3 or "", amex1 or "", amex2 or "", amex3 or "", voucher or "",
+    deposit_plus or "", deposit_minus or "", deliveroo or "", ubereats or "", petty_cash or "", tips_credit_card or "",
+    tips_sc or "", remaining_custom or "", float_val or "",
+    deposits, petty_cash_note, eat_out,
+    comments, manager, floor_staff, kitchen_staff
+] + (photo_links if photo_links else [])  # Görselleri aynı satıra hücre hücre ekle
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("✅ All information and images sent successfully!")
