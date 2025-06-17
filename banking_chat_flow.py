@@ -102,6 +102,9 @@ if submitted:
     sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("✅ Data successfully sent!")
 
-    for key in st.session_state.keys():
-        st.session_state[key] = 0.0
+    for key in list (st.session_state.keys()):
+        try:
+        st.session_state[key] = 0.0 if isinstrance(st.session_state[key], float) else""
+        except Exception:
+    st.session_state.clear()
     st.rerun()
