@@ -110,7 +110,7 @@ if submitted:
     row = [
     str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
     staff_food, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
-    deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash,
+    deposit_minus, deliveroo, ubereats, petty_cash, deposit_plus,
     tips_credit_card, tips_sc,
 
     calculated_taken_in,        # 💸 Taken In
