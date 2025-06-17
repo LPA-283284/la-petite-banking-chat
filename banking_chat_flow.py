@@ -103,11 +103,14 @@ if submitted:
     
     st.success("✅ Data successfully sent!")
 
-    or key in list(st.session_state.keys()):
-    try:
-        del st.session_state[key]
-    except Exception:
-        pass
+   or key in list(st.session_state.keys()):
+        if isinstance(st.session_state[key], float):
+            st.session_state[key] = 0.0
+        elif isinstance(st.session_state[key], str):
+            st.session_state[key] = ""
+        elif isinstance(st.session_state[key], int):
+            st.session_state[key] = 0
+        else:
+            del st.session_state[key]
 
-    st.session_state.clear()
     st.rerun()
