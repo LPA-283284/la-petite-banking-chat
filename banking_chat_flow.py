@@ -87,6 +87,7 @@ if submitted:
     sheet = client.open("La Petite Banking Extended")
     banking_sheet = sheet.worksheet("BANKING")
 
+    UPLOAD_FOLDER_ID = "18HTYODsW_iDd9EBj3-bquyyGaWxflU
     photo_links = []
     if uploaded_files:
         creds_drive = Credentials.from_service_account_info(
@@ -98,7 +99,8 @@ if submitted:
         for uploaded_file in uploaded_files:
             media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
             uploaded = drive_service.files().create(
-                body={'name': uploaded_file.name}, media_body=media, fields='id'
+                body={'name': uploaded_file.name,
+                     'parents': [UPLOAD_FOLDER_ID] 18HTYODsW_iDd9EBj3-bquyyGaWxflU}, media_body=media, fields='id'
             ).execute()
             drive_service.permissions().create(
                 fileId=uploaded['id'],
