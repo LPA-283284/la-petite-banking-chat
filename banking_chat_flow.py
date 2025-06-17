@@ -109,11 +109,10 @@ if submitted:
     # Satır gönder
     row = [
     str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
-    staff_food, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
+    staff_food, calculated_taken_in,        # 💸 Taken In, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
     deposit_minus, deliveroo, ubereats, petty_cash, deposit_plus,
     tips_credit_card, tips_sc, float_val, cash_tips,
 
-    calculated_taken_in,        # 💸 Taken In
     remaining_custom,           # 🧮 Till Balance
     remaining_custom + cash_tips,  # 💰 Cash in Envelope
     tips_credit_card + tips_sc + cash_tips,  # ➕ Tips Breakdown
