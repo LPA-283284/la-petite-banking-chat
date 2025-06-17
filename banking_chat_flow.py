@@ -51,7 +51,7 @@ tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f",
 
 
 # Özet
-    deducted_items = (
+deducted_items = (
     (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
     (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
     (voucher or 0.0) + (deposit_minus or 0.0) +
