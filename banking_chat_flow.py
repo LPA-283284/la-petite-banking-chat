@@ -66,9 +66,6 @@ st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_cre
 
 # Form alanlarıyla birlikte
 with st.form("banking_form"):
-    st.text_input("Gross (£)", key="gross_total")
-    st.text_input("Net (£)", key="net_total")
-    st.text_input("Service Charge (£)", key="service_charge")
     deposits = st.text_area("Deposits")
     petty_cash_note = st.text_area("Petty Cash")
     eat_out = st.text_input("Eat Out to Help Out")
