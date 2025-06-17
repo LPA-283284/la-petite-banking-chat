@@ -44,6 +44,7 @@ deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f
 tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
 tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
 
+
 deducted_items = (
     (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
     (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
@@ -68,14 +69,7 @@ with st.form("banking_form"):
     manager = st.text_input("Manager")
     floor_staff = st.text_input("Service Personnel")
     kitchen_staff = st.text_input("Kitchen Staff")
-
-    # 🔻 Görsel yükleme var ama GÖSTERİLMİYOR
-    uploaded_files = st.file_uploader(
-        "📷 Upload Receipts or Photos", 
-        type=["jpg", "jpeg", "png", "pdf"], 
-        accept_multiple_files=True
-    )
-
+    uploaded_files = st.file_uploader("\ud83d\udcf7 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True, label_visibility="collapsed")
     submitted = st.form_submit_button("Submit")
 
 if submitted:
@@ -87,9 +81,9 @@ if submitted:
     sheet = client.open("La Petite Banking Extended")
     banking_sheet = sheet.worksheet("BANKING")
 
-    UPLOAD_FOLDER_ID = "18HTYODsW_iDd9EBj3-bquyyGaWxflU
     photo_links = []
     if uploaded_files:
+        UPLOAD_FOLDER_ID = "18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"
         creds_drive = Credentials.from_service_account_info(
             json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
             scopes=["https://www.googleapis.com/auth/drive"]
@@ -99,8 +93,9 @@ if submitted:
         for uploaded_file in uploaded_files:
             media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
             uploaded = drive_service.files().create(
-                body={'name': uploaded_file.name,
-                     'parents': [UPLOAD_FOLDER_ID] 18HTYODsW_iDd9EBj3}, media_body=media, fields='id'
+                body={'name': uploaded_file.name, 'parents': [UPLOAD_FOLDER_ID]},
+                media_body=media,
+                fields='id'
             ).execute()
             drive_service.permissions().create(
                 fileId=uploaded['id'],
@@ -116,7 +111,7 @@ if submitted:
         tips_sc, remaining_custom, float_val,
         deposits, petty_cash_note, eat_out,
         comments, manager, floor_staff, kitchen_staff
-    ] + photo_links  # 🔹 Her görsel linki ayrı hücreye eklenir
+    ] + photo_links
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
     st.success("✅ All information and images successfully sent!")
