@@ -111,7 +111,12 @@ if submitted:
         str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
         staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
         deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
-        tips_sc, remaining_custom, float_val,
+        tips_sc, 
+        calculated_taken_in,        # Taken In
+        remaining_custom,           # Till Balance
+        remaining_custom + (cash_tips or 0.0),  # Cash in Envelope
+        (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # Cash Tips Breakdown
+        remaining_custom, float_val,
         deposits, petty_cash_note, eat_out,
         comments, manager, floor_staff, kitchen_staff
     ] + photo_links  # Her link ayrı hücreye
