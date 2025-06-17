@@ -68,11 +68,13 @@ with st.form("banking_form"):
     manager = st.text_input("Manager")
     floor_staff = st.text_input("Service Personnel")
     kitchen_staff = st.text_input("Kitchen Staff")
-    uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
-    if uploaded_files:
-        for uploaded_file in uploaded_files:
-            st.image(uploaded_file, caption=uploaded_file.name)
+    # 🔻 Görsel yükleme var ama GÖSTERİLMİYOR
+    uploaded_files = st.file_uploader(
+        "📷 Upload Receipts or Photos", 
+        type=["jpg", "jpeg", "png", "pdf"], 
+        accept_multiple_files=True
+    )
 
     submitted = st.form_submit_button("Submit")
 
