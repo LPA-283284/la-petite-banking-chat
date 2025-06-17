@@ -100,13 +100,14 @@ if submitted:
         comments, manager, floor_staff, kitchen_staff, ", ".join(photo_links)
     ]
     sheet.append_row(row, value_input_option="USER_ENTERED")
-    for key in list(st.session_state.keys()):
-    try:
-        del st.session_state[key]
-    except KeyError:
-        pass
+    
     st.success("✅ Data successfully sent!")
 
+    or key in list(st.session_state.keys()):
+    try:
+        del st.session_state[key]
+    except Exception:
+        pass
 
     st.session_state.clear()
     st.rerun()
