@@ -20,44 +20,54 @@ today = datetime.date.today()
 date = st.date_input("Date", today)
 
 # Sayısal girişler
-gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None)
-net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None)
-service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None)
-discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None)
-complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None)
-staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None)
+gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
+net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="net_total")
+service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="service_charge")
+discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
+complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
+staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
+
 
 # Hesaplama
-calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
+calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
+
 # Diğer ödemeler
-cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None)
-cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None)
-cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None)
-amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=None)
-amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None)
-amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None)
-voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None)
-deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None)
-deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None)
-ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None)
-petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None)
-deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None)
-tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None)
-tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None)
+cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc1")
+cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc2")
+cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc3")
+amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex1")
+amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex2")
+amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex3")
+voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="voucher")
+deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_minus")
+deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deliveroo")
+ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="ubereats")
+petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="petty_cash")
+deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
+tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
+tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
+
 
 # Özet
-deducted_items = cc1 + cc2 + cc3 + amex1 + amex2 + amex3 + voucher + deposit_minus + deliveroo + ubereats + petty_cash
-added_items = deposit_plus + tips_credit_card + tips_sc
+    (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
+    (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
+    (voucher or 0.0) + (deposit_minus or 0.0) +
+    (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
+)
+added_items = (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
 remaining_custom = calculated_taken_in - deducted_items + added_items
 
-float_val = st.number_input("Float (£)", min_value=0.0, format="%.2f", value=None)
-cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None)
+
+float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=None, placeholder="75.00", key="float_val")
+cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_tips")
+
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
-st.markdown(f"### 💰 Cash in Envelope Total: £{remaining_custom + cash_tips:.2f}")
-st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{tips_credit_card + tips_sc + cash_tips:.2f}")
+st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
+st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
+
 
 # Görsel yükleme (form dışında, görünür değil)
 uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
