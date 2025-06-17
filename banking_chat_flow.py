@@ -64,54 +64,64 @@ st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
+# Form alanlarıyla birlikte
+with st.form("banking_form"):
+    st.text_input("Gross (£)", key="gross_total")
+    st.text_input("Net (£)", key="net_total")
+    st.text_input("Service Charge (£)", key="service_charge")
+    deposits = st.text_area("Deposits")
+    petty_cash_note = st.text_area("Petty Cash")
+    eat_out = st.text_input("Eat Out to Help Out")
+    comments = st.text_area("Customer Reviews")
+    manager = st.text_input("Manager")
+    floor_staff = st.text_input("Service Personnel")
+    kitchen_staff = st.text_input("Kitchen Staff")
+    uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
-# Görsel yükleme
-uploaded_file = st.file_uploader("📷 Upload Receipt or Photo", type=["jpg", "jpeg", "png", "pdf"])
-photo_link = ""
-if uploaded_file:
-    creds_drive = Credentials.from_service_account_info(
+    submitted = st.form_submit_button("Submit")
+
+if submitted:
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(
         json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
-        scopes=["https://www.googleapis.com/auth/drive"]
+        scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
     )
-    drive_service = build('drive', 'v3', credentials=creds_drive)
-    media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
-    uploaded = drive_service.files().create(
-        body={'name': uploaded_file.name}, media_body=media, fields='id'
-    ).execute()
-    drive_service.permissions().create(
-        fileId=uploaded['id'],
-        body={'type': 'anyone', 'role': 'reader'}
-    ).execute()
-    photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
-    st.success("📸 Image uploaded to Google Drive!")
-    st.image(photo_link)
+    client = gspread.authorize(creds)
+    sheet = client.open("La Petite Banking Extended")
+    banking_sheet = sheet.worksheet("BANKING")
 
-# Ek alanlar
-deposits = st.text_area("Deposits")
-petty_cash_note = st.text_area("Petty Cash")
-eat_out = st.text_input("Eat Out to Help Out")
-comments = st.text_area("Customer Reviews")
-manager = st.text_input("Manager")
-floor_staff = st.text_input("Service Personnel")
-kitchen_staff = st.text_input("Kitchen Staff")
+    gross_total = st.session_state.get("gross_total", "")
+    net_total = st.session_state.get("net_total", "")
+    service_charge = st.session_state.get("service_charge", "")
 
-# Sheets bağlantısı
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
-creds = ServiceAccountCredentials.from_json_keyfile_dict(info, scope)
-client = gspread.authorize(creds)
-sheet = client.open("La Petite Banking Extended").sheet1
+    photo_links = []
+    if uploaded_files:
+        creds_drive = Credentials.from_service_account_info(
+            json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
+            scopes=["https://www.googleapis.com/auth/drive"]
+        )
+        drive_service = build('drive', 'v3', credentials=creds_drive)
 
-if st.button("Send it"):
+        for uploaded_file in uploaded_files:
+            media = MediaIoBaseUpload(uploaded_file, mimetype=uploaded_file.type)
+            uploaded = drive_service.files().create(
+                body={'name': uploaded_file.name}, media_body=media, fields='id'
+            ).execute()
+            drive_service.permissions().create(
+                fileId=uploaded['id'],
+                body={'type': 'anyone', 'role': 'reader'}
+            ).execute()
+            photo_link = f"https://drive.google.com/uc?id={uploaded['id']}"
+            photo_links.append(photo_link)
+            st.success(f"📸 Uploaded: {uploaded_file.name}")
+            st.image(photo_link)
+
     row = [
-        str(date), gross_total, net_total, service_charge, discount_total, complimentary_total,
-        staff_food, calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3, voucher,
-        deposit_plus, deposit_minus, deliveroo, ubereats, petty_cash, tips_credit_card,
-        tips_sc, remaining_custom, float_val,
-        deposits, petty_cash_note, eat_out,
-        comments, manager, floor_staff, kitchen_staff, photo_link
-    ]
-    sheet.append_row(row, value_input_option="USER_ENTERED")
-    st.success("✅ Data successfully sent!")
-    st.session_state["form_submitted"] = True
+        str(date), gross_total, net_total, service_charge,
+        deposits, petty_cash_note, eat_out, comments,
+        manager, floor_staff, kitchen_staff
+    ] + photo_links
+
+    banking_sheet.append_row(row, value_input_option="USER_ENTERED")
+    st.success("✅ All information and images successfully sent!")
+    st.session_state.clear()
     st.rerun()
