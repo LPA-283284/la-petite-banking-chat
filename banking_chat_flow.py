@@ -96,7 +96,7 @@ if submitted:
         for file in uploaded_files:
             media = MediaIoBaseUpload(file, mimetype=file.type)
             uploaded = drive_service.files().create(
-                body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"]},
+                body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3"]},
                 media_body=media,
                 fields="id"
             ).execute()
