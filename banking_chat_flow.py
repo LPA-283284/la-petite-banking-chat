@@ -142,15 +142,15 @@ if submitted:
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
     # İkinci sheet'e özet veri gönder
-second_sheet = client.open("LPA Banking").worksheet("BANKING")
-summary_row = [
+    second_sheet = client.open("LPA Banking").worksheet("BANKING")
+    summary_row = [
     str(date),
     calculated_taken_in,
     service_charge,
     tips_credit_card,
     cash_tips
 ]
-second_sheet.append_row(summary_row, value_input_option="USER_ENTERED")
+    second_sheet.append_row(summary_row, value_input_option="USER_ENTERED")
 
     st.success("✅ All information and images sent successfully!")
     st.session_state.form_submitted = True
