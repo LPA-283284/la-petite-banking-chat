@@ -154,7 +154,9 @@ if submitted:
 
     st.session_state.form_submitted = True
     st.rerun()
-    if "form_submitted" in st.session_state and st.session_state["form_submitted"]:
+
+# Form başarıyla gönderildiyse sabit başarı mesajı göster
+if "form_submitted" in st.session_state and st.session_state["form_submitted"]:
     st.markdown(
         """
         <div style="background-color:#d4edda;padding:20px;border-radius:10px;border:1px solid #c3e6cb;">
