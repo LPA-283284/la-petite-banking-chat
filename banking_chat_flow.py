@@ -153,7 +153,7 @@ if submitted:
     second_sheet.append_row(summary_row, value_input_option="USER_ENTERED")
 
     st.session_state.form_submitted = True
-    st.rerun()
+
 
 # Form başarıyla gönderildiyse sabit başarı mesajı göster
 if "form_submitted" in st.session_state and st.session_state["form_submitted"]:
