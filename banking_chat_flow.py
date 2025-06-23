@@ -20,7 +20,7 @@ today = datetime.date.today()
 date = st.date_input("Date", today)
 
 # Sayısal girişler
-z_number = st.z_number("Z Number (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="z_number")
+z_number = st.number_input("Z Number (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="z_number")
 gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="net_total")
 service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="service_charge")
