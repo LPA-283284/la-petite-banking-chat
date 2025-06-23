@@ -120,7 +120,7 @@ if submitted:
     # Satır gönder
     row = [
     str(date),
-    gross_total, net_total, service_charge, discount_total, complimentary_total,
+    z_number, gross_total, net_total, service_charge, discount_total, complimentary_total,
     staff_food,
     calculated_taken_in,                  # 💸 Taken In
     cc1, cc2, cc3, amex1, amex2, amex3,   # 💳 Kartlar
