@@ -78,7 +78,6 @@ uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg",
 with st.form("banking_form"):
     deposits = st.text_area("Deposits")
     petty_cash_note = st.text_area("Petty Cash Note")
-    eat_out = st.text_input("Eat Out to Help Out")
     comments = st.text_area("Customer Reviews")
     manager = st.text_input("Manager")
     floor_staff = st.text_input("Service Personnel")
@@ -136,7 +135,7 @@ if submitted:
 
     float_val, cash_tips,                 # 💼 Float ve Nakit
 
-    deposits, petty_cash_note, eat_out,
+    deposits, petty_cash_note,
     comments, manager, floor_staff, kitchen_staff
 ] + photo_links  # Her link ayrı hücreye
 
