@@ -75,7 +75,7 @@ cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", valu
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 # 💵 Elimde Olan Para girişi (Till Balance'ın hemen altında)
 actual_cash = st.number_input(
-    "💵 Elimde Olan Para (£)",
+    "💵Money I have (£)",
     min_value=0.0,
     format="%.2f",
     value=0.0,
