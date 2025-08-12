@@ -73,6 +73,19 @@ cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", valu
 
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
+# 💵 Elimde Olan Para girişi (Till Balance'ın hemen altında)
+actual_cash = st.number_input(
+    "💵 Elimde Olan Para (£)",
+    min_value=0.0,
+    format="%.2f",
+    value=0.0,
+    key="actual_cash"
+)
+
+# (Opsiyonel) Farkı göster: Elindeki nakit - Till Balance
+cash_difference = actual_cash - (remaining_custom or 0.0)
+st.markdown(f"**Fark:** £{cash_difference:.2f}")
+
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
