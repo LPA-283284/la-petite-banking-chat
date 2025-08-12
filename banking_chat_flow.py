@@ -101,27 +101,36 @@ with st.form("banking_form"):
 
 # FORM GÖNDERİLDİ
 if submitted:
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(
-        json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
+    # --- Primary creds (BAŞKA HESAP) ---
+    primary_info = json.loads(st.secrets["PRIMARY_GOOGLE_SHEETS_CREDENTIALS"])
+    primary_creds = ServiceAccountCredentials.from_json_keyfile_dict(
+        primary_info,
         scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
     )
-    client = gspread.authorize(creds)
-    sheet = client.open("La Petite Banking Extended")
-    banking_sheet = sheet.worksheet("BANKING")
+    primary_client = gspread.authorize(primary_creds)
 
-    # Drive upload (klasöre)
+    # --- Secondary creds (MEVCUT HESAP) ---
+    secondary_info = json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"])
+    secondary_creds = ServiceAccountCredentials.from_json_keyfile_dict(
+        secondary_info,
+        scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    )
+    secondary_client = gspread.authorize(secondary_creds)
+
+    # --- Drive upload (klasöre) ---
     photo_links = []
     if uploaded_files:
-        creds_drive = Credentials.from_service_account_info(
-            json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
+        drive_creds = Credentials.from_service_account_info(
+            secondary_info,
             scopes=["https://www.googleapis.com/auth/drive"]
         )
-        drive_service = build('drive', 'v3', credentials=creds_drive)
+        drive_service = build('drive', 'v3', credentials=drive_creds)
+        folder_id = "18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"
 
         for file in uploaded_files:
             media = MediaIoBaseUpload(file, mimetype=file.type)
             uploaded = drive_service.files().create(
-                body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"]},
+                body={"name": file.name, "parents": [folder_id]},
                 media_body=media,
                 fields="id"
             ).execute()
@@ -131,76 +140,57 @@ if submitted:
             ).execute()
             photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
 
+    # En fazla 6 görsel sütunu
+    max_images = 6
+    photo_links = (photo_links + [""] * max_images)[:max_images]
+
     # --- PRIMARY SHEET: La Petite Banking Extended / BANKING ---
     primary_ss = primary_client.open("La Petite Banking Extended")
     banking_sheet = primary_ss.worksheet("BANKING")
 
-    # Google Sheet column order (tam istediğin sıra):
-    # DATE | Z-NUMBER | GROSS | NET | SC | DISCOUNT | COMPLIMENTARY | STAFF FOOD | TAKE-IN |
-    # CC-1 | CC-2 | CC-3 | AMEX-1 | AMEX-2 | AMEX-3 | VOUCHER | DEPOSIT (-) | DELIVEROO | UBER EATS |
-    # PETTY CASH | DEPOSIT (+) | CC TIPS | SC | TILL BALANCE | CASH IN ENVELOPE | MONEY I HAVE |
-    # CC+SC+CASH | FLOAT | CASH TIPS | DEPOSITS - NOTES | PETTY CASH - NOTES | COSTUMERS REVIEWS |
-    # MANAGER | IMAGES-1..6
+    # Satır (senin istediğin sırada)
     row = [
-        date_str,                           # DATE (DD/MM/YYYY)
-        z_number,                           # Z - NUMBER
-        gross_total,                        # GROSS
-        net_total,                          # NET
-        service_charge,                     # SC
-        discount_total,                     # DISCOUNT
-        complimentary_total,                # COMPLIMENTARY
-        staff_food,                         # STAFF FOOD
-        calculated_taken_in,                # TAKE-IN
-        cc1,                                # CC-1
-        cc2,                                # CC-2
-        cc3,                                # CC-3
-        amex1,                              # AMEX-1
-        amex2,                              # AMEX-2
-        amex3,                              # AMEX-3
-        voucher,                            # VOUCHER
-        deposit_minus,                      # DEPOSIT (-)
-        deliveroo,                          # DELIVEROO
-        ubereats,                           # UBER EATS
-        petty_cash,                         # PETTY CASH
-        deposit_plus,                       # DEPOSIT (+)
-        tips_credit_card,                   # CC TIPS
-        tips_sc,                            # SC
-        remaining_custom,                   # TILL BALANCE
-        cash_in_envelope,                   # CASH IN ENVELOPE (Money I Have + Cash Tips)
-        money_i_have,                       # MONEY I HAVE
-        tips_total,                         # CC+SC+CASH
-        float_val,                          # FLOAT
-        cash_tips,                          # CASH TIPS
-        deposits,                           # DEPOSITS - NOTES
-        petty_cash_note,                    # PETTY CASH - NOTES
-        comments,                           # COSTUMERS REVIEWS
-        manager,                            # MANAGER
-    ] + photo_links                         # IMAGES -1..6
+        date.strftime("%d/%m/%Y"),  # DATE
+        z_number,                   # Z - NUMBER
+        gross_total, net_total, service_charge, discount_total, complimentary_total,
+        staff_food,
+        (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0)),  # TAKE-IN
+        cc1, cc2, cc3, amex1, amex2, amex3,
+        voucher,
+        deposit_minus, deliveroo, ubereats, petty_cash,
+        deposit_plus,
+        tips_credit_card, tips_sc,
+        # TILL BALANCE
+        ((gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))) -
+        ((cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) + (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
+         (voucher or 0.0) + (deposit_minus or 0.0) + (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)) +
+        ((deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)),
+        # CASH IN ENVELOPE = Money I Have + Cash Tips
+        (st.session_state.get("money_i_have", 0.0) or 0.0) + (cash_tips or 0.0),
+        st.session_state.get("money_i_have", 0.0) or 0.0,             # MONEY I HAVE
+        (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
+        st.session_state.get("float_val", 75.0) if "float_val" in st.session_state else 75.0,  # FLOAT
+        cash_tips,                 # CASH TIPS
+        st.session_state.get("deposits", ""),            # DEPOSITS - NOTES
+        st.session_state.get("petty_cash_note", ""),     # PETTY CASH - NOTES
+        st.session_state.get("comments", ""),            # COSTUMERS REVIEWS
+        st.session_state.get("manager", ""),             # MANAGER
+    ] + photo_links
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
-    # İkinci sheet'e özet veri gönder
-    second_sheet = client.open("LPA Banking").worksheet("BANKING")
-    summary_row = [
-    date.strftime("%d/%m/%Y"),
-    calculated_taken_in,
-    service_charge,
-    tips_credit_card,
-    cash_tips,
-    actual_cash
-]
-    second_sheet.append_row(summary_row, value_input_option="USER_ENTERED")
-
-    st.session_state.form_submitted = True
-
-
-# Form başarıyla gönderildiyse sabit başarı mesajı göster
-if "form_submitted" in st.session_state and st.session_state["form_submitted"]:
-    st.markdown(
-        """
-        <div style="background-color:#d4edda;padding:20px;border-radius:10px;border:1px solid #c3e6cb;">
-            <h4 style="color:#155724;">✅ All information and images sent successfully!</h4>
-        </div>
-        """,
-        unsafe_allow_html=True
+    # --- SECONDARY SHEET: LPA Banking / BANKING ---
+    secondary_ss = secondary_client.open("LPA Banking")
+    second_sheet = secondary_ss.worksheet("BANKING")
+    second_sheet.append_row(
+        [
+            date.strftime("%d/%m/%Y"),
+            (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0)),
+            service_charge,
+            tips_credit_card,
+            cash_tips,
+        ],
+        value_input_option="USER_ENTERED"
     )
+
+    st.session_state["form_submitted"] = True
