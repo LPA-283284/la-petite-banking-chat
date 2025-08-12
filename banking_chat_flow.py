@@ -119,7 +119,7 @@ if submitted:
 
     # Satır gönder
     row = [
-    str(date),
+    date.strftime("%d/%m/%Y"),
     z_number, gross_total, net_total, service_charge, discount_total, complimentary_total,
     staff_food,
     calculated_taken_in,                  # 💸 Taken In
@@ -144,7 +144,7 @@ if submitted:
     # İkinci sheet'e özet veri gönder
     second_sheet = client.open("LPA Banking").worksheet("BANKING")
     summary_row = [
-    str(date),
+    date.strftime("%d/%m/%Y"),
     calculated_taken_in,
     service_charge,
     tips_credit_card,
