@@ -162,7 +162,8 @@ if submitted:
     calculated_taken_in,
     service_charge,
     tips_credit_card,
-    cash_tips
+    cash_tips,
+    actual_cash
 ]
     second_sheet.append_row(summary_row, value_input_option="USER_ENTERED")
 
