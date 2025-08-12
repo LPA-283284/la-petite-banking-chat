@@ -96,9 +96,7 @@ with st.form("banking_form"):
     petty_cash_note = st.text_area("Petty Cash Note")
     comments = st.text_area("Customer Reviews")
     manager = st.text_input("Manager")
-    floor_staff = st.text_input("Service Personnel")
-    kitchen_staff = st.text_input("Kitchen Staff")
-
+    
     submitted = st.form_submit_button("Submit")
 
 # FORM GÖNDERİLDİ
@@ -152,7 +150,7 @@ if submitted:
     float_val, cash_tips,                 # 💼 Float ve Nakit
 
     deposits, petty_cash_note,
-    comments, manager, floor_staff, kitchen_staff
+    comments, manager
 ] + photo_links  # Her link ayrı hücreye
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
