@@ -131,27 +131,51 @@ if submitted:
             ).execute()
             photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
 
-    # Satır gönder
+    # --- PRIMARY SHEET: La Petite Banking Extended / BANKING ---
+    primary_ss = primary_client.open("La Petite Banking Extended")
+    banking_sheet = primary_ss.worksheet("BANKING")
+
+    # Google Sheet column order (tam istediğin sıra):
+    # DATE | Z-NUMBER | GROSS | NET | SC | DISCOUNT | COMPLIMENTARY | STAFF FOOD | TAKE-IN |
+    # CC-1 | CC-2 | CC-3 | AMEX-1 | AMEX-2 | AMEX-3 | VOUCHER | DEPOSIT (-) | DELIVEROO | UBER EATS |
+    # PETTY CASH | DEPOSIT (+) | CC TIPS | SC | TILL BALANCE | CASH IN ENVELOPE | MONEY I HAVE |
+    # CC+SC+CASH | FLOAT | CASH TIPS | DEPOSITS - NOTES | PETTY CASH - NOTES | COSTUMERS REVIEWS |
+    # MANAGER | IMAGES-1..6
     row = [
-    date.strftime("%d/%m/%Y"),
-    z_number, gross_total, net_total, service_charge, discount_total, complimentary_total,
-    staff_food,
-    calculated_taken_in,                  # 💸 Taken In
-    cc1, cc2, cc3, amex1, amex2, amex3,   # 💳 Kartlar
-    voucher,
-    deposit_minus, deliveroo, ubereats, petty_cash,
-    deposit_plus,
-    tips_credit_card, tips_sc,
-
-    remaining_custom,                     # 🧮 Till Balance
-    remaining_custom + cash_tips,         # 💰 Cash in Envelope
-    tips_credit_card + tips_sc + cash_tips, # ➕ Tips Breakdown
-
-    float_val, cash_tips,                 # 💼 Float ve Nakit
-
-    deposits, petty_cash_note,
-    comments, manager
-] + photo_links  # Her link ayrı hücreye
+        date_str,                           # DATE (DD/MM/YYYY)
+        z_number,                           # Z - NUMBER
+        gross_total,                        # GROSS
+        net_total,                          # NET
+        service_charge,                     # SC
+        discount_total,                     # DISCOUNT
+        complimentary_total,                # COMPLIMENTARY
+        staff_food,                         # STAFF FOOD
+        calculated_taken_in,                # TAKE-IN
+        cc1,                                # CC-1
+        cc2,                                # CC-2
+        cc3,                                # CC-3
+        amex1,                              # AMEX-1
+        amex2,                              # AMEX-2
+        amex3,                              # AMEX-3
+        voucher,                            # VOUCHER
+        deposit_minus,                      # DEPOSIT (-)
+        deliveroo,                          # DELIVEROO
+        ubereats,                           # UBER EATS
+        petty_cash,                         # PETTY CASH
+        deposit_plus,                       # DEPOSIT (+)
+        tips_credit_card,                   # CC TIPS
+        tips_sc,                            # SC
+        remaining_custom,                   # TILL BALANCE
+        cash_in_envelope,                   # CASH IN ENVELOPE (Money I Have + Cash Tips)
+        money_i_have,                       # MONEY I HAVE
+        tips_total,                         # CC+SC+CASH
+        float_val,                          # FLOAT
+        cash_tips,                          # CASH TIPS
+        deposits,                           # DEPOSITS - NOTES
+        petty_cash_note,                    # PETTY CASH - NOTES
+        comments,                           # COSTUMERS REVIEWS
+        manager,                            # MANAGER
+    ] + photo_links                         # IMAGES -1..6
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
