@@ -82,9 +82,6 @@ actual_cash = st.number_input(
     key="actual_cash"
 )
 
-# (Opsiyonel) Farkı göster: Elindeki nakit - Till Balance
-cash_difference = actual_cash - (remaining_custom or 0.0)
-st.markdown(f"**Fark:** £{cash_difference:.2f}")
 
 st.markdown(f"### 💰 Cash in Envelope Total: £{(actual_cash or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
