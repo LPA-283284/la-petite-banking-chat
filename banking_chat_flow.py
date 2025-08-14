@@ -149,7 +149,7 @@ if submitted:
         (amex3 or 0.0),                       # Amex #3
         (voucher or 0.0),                     # Voucher
         (petty_cash or 0.0),                  # Petty Cash Expense
-        (deposit_minus or 0.0),               # Advance & Cash Wages
+        (advance_cash_wages or 0.0),          # Advance & Cash Wages
         petty_cash_note,                      # Petty Cash / Advance Details
         (deposit_plus or 0.0),                # Deposit In
         (deposit_minus or 0.0),               # Deposit Out
