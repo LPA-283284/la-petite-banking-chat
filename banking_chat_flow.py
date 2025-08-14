@@ -129,6 +129,7 @@ if submitted:
     images = (photo_links + [""] * 6)[:6]
 
     # Satır gönder (Extended sheet) — senin istediğin başlık sırası
+        # Satır gönder (Extended sheet) — senin istediğin başlık sırası
     row = [
         date_str,                             # Date
         z_number,                             # Z #NO
@@ -145,6 +146,7 @@ if submitted:
         (amex1 or 0.0),                       # Amex #1
         (amex2 or 0.0),                       # Amex #2
         (amex3 or 0.0),                       # Amex #3
+        (voucher or 0.0),                     # Voucher
         (petty_cash or 0.0),                  # Petty Cash Expense
         (deposit_minus or 0.0),               # Advance & Cash Wages
         petty_cash_note,                      # Petty Cash / Advance Details
@@ -166,7 +168,7 @@ if submitted:
         manager                               # Managers
     ] + images                                # IMAGES -1 to IMAGES -6
 
-    banking_sheet.append_row(row, value_input_option="USER_ENTERED")
+     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
     # İkinci sheet'e özet veri
     second_sheet = client.open("LPA Banking").worksheet("BANKING")
