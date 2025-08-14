@@ -160,8 +160,7 @@ if submitted:
         (service_charge or 0.0),
         (tips_credit_card or 0.0),
         (cash_tips or 0.0),
-        (money_i_have or 0.0),
-        (difference or 0.0)
+        (money_i_have or 0.0)
     ]
     second_sheet.append_row(summary_row, value_input_option="USER_ENTERED")
 
