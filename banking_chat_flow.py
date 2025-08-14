@@ -130,7 +130,7 @@ if submitted:
 
     # Satır gönder (Extended sheet) — senin istediğin başlık sırası
         # Satır gönder (Extended sheet) — senin istediğin başlık sırası
-    row = [
+row = [
         date_str,                             # Date
         z_number,                             # Z #NO
         (gross_total or 0.0),                 # Gross
