@@ -21,11 +21,11 @@ date_str = date.strftime("%d/%m/%Y")
 # Sayısal girişler
 z_number = st.text_input("Z Number")
 gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
-net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="net_total")
-service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="service_charge")
-discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="discount_total")
-complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="complimentary_total")
-staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="staff_food")
+net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="net_total")
+service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="service_charge")
+discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
+complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
+staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
 
 # Hesaplama
 calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
