@@ -44,8 +44,6 @@ deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", valu
 ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="ubereats")
 petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="petty_cash")
 deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
-
-# Doğru key eşleşmesi
 tips_sc = st.number_input("Service Charge Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_sc")
 tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
 
@@ -128,47 +126,31 @@ if submitted:
             ).execute()
             photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
 
-    # Satır gönder (Extended sheet) — Z Number dahil
-   row = [
-        # DATE
-        date_str,
-        # Z  - NUMBER
-        z_number,
-        # GROSS, NET, SC, DISCOUNT, COMLIMENTARY, STAFF FOOD
+    images = (photo_links + [""] * 6)[:6]
+
+    # Satır gönder (Extended sheet)
+    row = [
+        date_str, z_number,
         (gross_total or 0.0), (net_total or 0.0), (service_charge or 0.0), (discount_total or 0.0),
         (complimentary_total or 0.0), (staff_food or 0.0),
-        # TAKE-IN
         (calculated_taken_in or 0.0),
-        # CC-1, CC-2, CC-3, AMEX-1, AMEX-2, AMEX-3
         (cc1 or 0.0), (cc2 or 0.0), (cc3 or 0.0), (amex1 or 0.0), (amex2 or 0.0), (amex3 or 0.0),
-        # VOCUHER
         (voucher or 0.0),
-        # DEPOSIT (-), DELIVEROO, UBER EATS, PETTY CASH
         (deposit_minus or 0.0), (deliveroo or 0.0), (ubereats or 0.0), (petty_cash or 0.0),
-        # DEPOSIT (+)
         (deposit_plus or 0.0),
-        # CC TIPS, SC
         (tips_credit_card or 0.0), (tips_sc or 0.0),
-        # TILL BALANCE
         (remaining_custom or 0.0),
-        # CASH IN ENVELOPE
         (remaining_custom or 0.0) + (cash_tips or 0.0),
-        # MONEY I HAVE
         (money_i_have or 0.0),
-        # DIFFERENCE
-        ( (money_i_have or 0.0) - (remaining_custom or 0.0) ),
-        # CC+SC+CASH
+        difference,
         (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),
-        # FLOAT, CASH TIPS
         (float_val or 0.0), (cash_tips or 0.0),
-        # DEPOSITS - NOTES, PETTY CASH  - NOTES, COSTUMERS REVIEWS, MANAGER
-        deposits, petty_cash_note, comments, manager,
-        # IMAGES -1 .. IMAGES -6
+        deposits, petty_cash_note, comments, manager
     ] + images
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
-    # İkinci sheet'e özet veri (Summary)
+    # Summary sheet
     second_sheet = client.open("LPA Banking").worksheet("BANKING")
     summary_row = [
         date_str,
