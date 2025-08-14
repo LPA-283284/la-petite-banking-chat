@@ -35,34 +35,34 @@ date = st.date_input("Date", today)
 z_number = st.text_input("Z Number")
 
 # Sayısal girişler (varsayılan 0.00; kullanıcı değiştirirse değerler hesaplara yansır)
-gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=0.0)
-net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=0.0)
-service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=0.0)
-discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=0.0)
-complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=0.0)
-staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=0.0)
+gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None)
+net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None)
+service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None)
+discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None)
+complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None)
+staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None)
 
 # Taken-In
 calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
 # Kart/ödemeler
-cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=0.0)
-cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=0.0)
-cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=0.0)
-amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=0.0)
-amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=0.0)
-amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=0.0)
-voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=0.0)
-deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=0.0)
-deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=0.0)
-ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=0.0)
-petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=0.0)
-deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=0.0)
+cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None)
+cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None)
+cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None)
+amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=None)
+amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None)
+amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None)
+voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None)
+deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None)
+deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None)
+ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None)
+petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None)
+deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None)
 
 # Bahşişler
-tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=0.0)
-tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=0.0)
+tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None)
+tips_sc = st.number_input("Servis Charge (£)", min_value=0.0, format="%.2f", value=None)
 
 # Özet hesaplamalar
 deducted_items = cc1 + cc2 + cc3 + amex1 + amex2 + amex3 + voucher + deposit_minus + deliveroo + ubereats + petty_cash
@@ -71,10 +71,10 @@ remaining_custom = calculated_taken_in - deducted_items + added_items  # Till Ba
 
 # Float ve Cash
 float_val = st.number_input("Float (£)", min_value=75.0, format="%.2f", value=75.0)
-cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=0.0)
+cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None)
 
 # Money I Have (yeni alan) ve Cash in Envelope Total = Money I Have + Cash Tips
-money_i_have = st.number_input("Money I Have (£)", min_value=0.0, format="%.2f", value=0.0)
+money_i_have = st.number_input("Money I Have (£)", min_value=0.0, format="%.2f", value=None)
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 st.markdown(f"### 💰 Cash in Envelope Total: £{(money_i_have + cash_tips):.2f}")
