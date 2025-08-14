@@ -168,7 +168,7 @@ row = [
         manager                               # Managers
     ] + images                                # IMAGES -1 to IMAGES -6
 
-     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
+    banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
     # İkinci sheet'e özet veri
     second_sheet = client.open("LPA Banking").worksheet("BANKING")
