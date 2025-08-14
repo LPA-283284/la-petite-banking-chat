@@ -154,7 +154,7 @@ if submitted:
         petty_cash_note,                      # Petty Cash / Advance Details
         (deposit_plus or 0.0),                # Deposit In
         (deposit_minus or 0.0),               # Deposit Out
-        deposits,                             # Deposit Details Name Date In/Out
+        notes,                                # Deposit Details Name Date In/Out
         (deliveroo or 0.0),                   # Deliveroo
         (ubereats or 0.0),                    # Uber Eats
         "",                                   # just
