@@ -130,7 +130,8 @@ if submitted:
 
     # Satır gönder (Extended sheet) — senin istediğin başlık sırası
         # Satır gönder (Extended sheet) — senin istediğin başlık sırası
-row = [
+    # Satır gönder (Extended sheet) — senin istediğin başlık sırası
+    row = [
         date_str,                             # Date
         z_number,                             # Z #NO
         (gross_total or 0.0),                 # Gross
@@ -166,7 +167,7 @@ row = [
         petty_cash_note,                      # Petty Cash - Notes
         comments,                             # Notes
         manager                               # Managers
-        ] + images                                # IMAGES -1 to IMAGES -6
+    ] + images                                # IMAGES -1 to IMAGES -6
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
