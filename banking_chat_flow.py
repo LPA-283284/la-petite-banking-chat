@@ -87,7 +87,7 @@ if st.session_state.cash_in_hand_first_edit and cash_in_hand != 0.0:
     st.session_state.cash_in_hand_first_edit = False
 
 # Fark hesaplama
-difference = (money_i_have or 0.0) - (remaining_custom or 0.0)
+difference = (cash_in_hand or 0.0) - (remaining_custom or 0.0)
 st.markdown(f"**Difference:** £{difference:.2f}")
 
 st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
