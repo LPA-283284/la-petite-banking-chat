@@ -164,9 +164,8 @@ if submitted:
         (money_i_have or 0.0),                # CASH IN HAND
         (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
         (float_val or 0.0),                   # Float
-        deposits,                             # Deposits - Notes
         petty_cash_note,                      # Petty Cash - Notes
-        comments,                             # Notes
+        notes,                                # Notes
         manager                               # Managers
     ] + images                                # IMAGES -1 to IMAGES -6
 
