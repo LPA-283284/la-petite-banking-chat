@@ -72,7 +72,7 @@ money_i_have = st.number_input(
     "Money I Have (£)",
     min_value=0.0,
     format="%.2f",
-    value=0.0 if st.session_state.money_i_have_first_edit else (st.session_state.get("money_i_have") or 0.0),
+    value=None if st.session_state.money_i_have_first_edit else (st.session_state.get("money_i_have") or 0.0),
     placeholder="0.00",
     key="money_i_have"
 )
