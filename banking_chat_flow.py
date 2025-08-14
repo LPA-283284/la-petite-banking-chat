@@ -64,8 +64,23 @@ cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", valu
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 
-# Yeni alan: Money I Have + fark
-money_i_have = st.number_input("Money I Have (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="money_i_have")
+# Money I Have (ilk dokunuşta 0.00 temizleme)
+if "money_i_have_first_edit" not in st.session_state:
+    st.session_state.money_i_have_first_edit = True
+
+money_i_have = st.number_input(
+    "Money I Have (£)",
+    min_value=0.0,
+    format="%.2f",
+    value=0.0 if st.session_state.money_i_have_first_edit else (st.session_state.get("money_i_have") or 0.0),
+    placeholder="0.00",
+    key="money_i_have"
+)
+
+if st.session_state.money_i_have_first_edit and money_i_have != 0.0:
+    st.session_state.money_i_have_first_edit = False
+
+# Fark hesaplama
 difference = (money_i_have or 0.0) - (remaining_custom or 0.0)
 st.markdown(f"**Difference:** £{difference:.2f}")
 
@@ -113,7 +128,7 @@ if submitted:
             ).execute()
             photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
 
-    # Satır gönder (Extended sheet) — Money I Have & Difference dahil
+    # Satır gönder (Extended sheet)
     row = [
         date_str,
         (gross_total or 0.0), (net_total or 0.0), (service_charge or 0.0), (discount_total or 0.0), (complimentary_total or 0.0),
@@ -125,8 +140,8 @@ if submitted:
         (deposit_plus or 0.0),
         (tips_credit_card or 0.0), (tips_sc or 0.0),
         (remaining_custom or 0.0),
-        (money_i_have or 0.0),        # 💰 Money I Have
-        (difference or 0.0),          # 🔍 Difference
+        (money_i_have or 0.0),
+        (difference or 0.0),
         (remaining_custom or 0.0) + (cash_tips or 0.0),
         (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),
         (float_val or 0.0), (cash_tips or 0.0),
@@ -136,7 +151,7 @@ if submitted:
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
-    # İkinci sheet'e özet veri (Summary) — Money I Have & Difference dahil
+    # İkinci sheet'e özet veri (Summary)
     second_sheet = client.open("LPA Banking").worksheet("BANKING")
     summary_row = [
         date_str,
@@ -144,8 +159,8 @@ if submitted:
         (service_charge or 0.0),
         (tips_credit_card or 0.0),
         (cash_tips or 0.0),
-        (money_i_have or 0.0),  # 💰 Money I Have
-        (difference or 0.0)     # 🔍 Difference
+        (money_i_have or 0.0),
+        (difference or 0.0)
     ]
     second_sheet.append_row(summary_row, value_input_option="USER_ENTERED")
 
@@ -162,4 +177,3 @@ if st.session_state.get("form_submitted"):
         unsafe_allow_html=True
     )
     st.session_state.pop("form_submitted", None)
-
