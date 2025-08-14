@@ -70,21 +70,21 @@ cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", valu
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 
-# Money I Have (ilk dokunuşta 0.00 temizleme)
-if "money_i_have_first_edit" not in st.session_state:
-    st.session_state.money_i_have_first_edit = True
+# Cash In Hand (ilk dokunuşta 0.00 temizleme)
+if "cash_in_hand_first_edit" not in st.session_state:
+    st.session_state.cash_in_hand_first_edit = True
 
-money_i_have = st.number_input(
-    "Money I Have (£)",
+cash_in_hand = st.number_input(
+    "Cash In Hand (£)",
     min_value=0.0,
     format="%.2f",
-    value=None if st.session_state.money_i_have_first_edit else (st.session_state.get("money_i_have") or 0.0),
+    value=None if st.session_state.cash_in_hand_first_edit else (st.session_state.get("cash_in_hand") or 0.0),
     placeholder="0.00",
-    key="money_i_have"
+    key="cash_in_hand"
 )
 
-if st.session_state.money_i_have_first_edit and money_i_have != 0.0:
-    st.session_state.money_i_have_first_edit = False
+if st.session_state.cash_in_hand_first_edit and cash_in_hand != 0.0:
+    st.session_state.cash_in_hand_first_edit = False
 
 # Fark hesaplama
 difference = (money_i_have or 0.0) - (remaining_custom or 0.0)
