@@ -114,25 +114,26 @@ if submitted:
             photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
 
     # Satır gönder (Extended sheet) — Money I Have & Difference dahil
-    row = [
-        date_str,
-        (gross_total or 0.0), (net_total or 0.0), (service_charge or 0.0), (discount_total or 0.0), (complimentary_total or 0.0),
-        (staff_food or 0.0),
-        (calculated_taken_in or 0.0),
-        (cc1 or 0.0), (cc2 or 0.0), (cc3 or 0.0), (amex1 or 0.0), (amex2 or 0.0), (amex3 or 0.0),
-        (voucher or 0.0),
-        (deposit_minus or 0.0), (deliveroo or 0.0), (ubereats or 0.0), (petty_cash or 0.0),
-        (deposit_plus or 0.0),
-        (tips_credit_card or 0.0), (tips_sc or 0.0),
-        (remaining_custom or 0.0),
-        (money_i_have or 0.0),        # 💰 Money I Have
-        (difference or 0.0),          # 🔍 Difference
-        (remaining_custom or 0.0) + (cash_tips or 0.0),
-        (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),
-        (float_val or 0.0), (cash_tips or 0.0),
-        deposits, petty_cash_note,
-        comments, manager
-    ] + photo_links
+   row = [
+    date_str,
+    (gross_total or 0.0), (net_total or 0.0), (service_charge or 0.0), (discount_total or 0.0), (complimentary_total or 0.0),
+    (staff_food or 0.0),
+    (calculated_taken_in or 0.0),
+    (cc1 or 0.0), (cc2 or 0.0), (cc3 or 0.0), (amex1 or 0.0), (amex2 or 0.0), (amex3 or 0.0),
+    (voucher or 0.0),
+    (deposit_minus or 0.0), (deliveroo or 0.0), (ubereats or 0.0), (petty_cash or 0.0),
+    (deposit_plus or 0.0),
+    (tips_credit_card or 0.0), (tips_sc or 0.0),
+    (remaining_custom or 0.0),
+    (money_i_have or 0.0),
+    (difference or 0.0),
+    (remaining_custom or 0.0) + (cash_tips or 0.0),
+    (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),
+    (float_val or 0.0), (cash_tips or 0.0),
+    deposits, petty_cash_note,
+    comments, manager,
+    z_number  # ✅ Z Number artık Extended sheet'e gidiyor
+] + photo_links
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
