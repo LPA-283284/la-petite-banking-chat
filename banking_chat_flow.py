@@ -130,50 +130,50 @@ if submitted:
 
     # Satır gönder (Extended sheet)
         # Satır gönder (Extended sheet)
-    row = [
-        # Date
-        date_str,
-        # Z #NO
-        z_number,
-        # Gross, Net, Service Charge, Discount, Complimentary, Staff Food
-        (gross_total or 0.0), (net_total or 0.0), (service_charge or 0.0),
-        (discount_total or 0.0), (complimentary_total or 0.0), (staff_food or 0.0),
-        # Take-In
-        (calculated_taken_in or 0.0),
-        # Card #1, Card #2, Card #3
-        (cc1 or 0.0), (cc2 or 0.0), (cc3 or 0.0),
-        # Amex #1, Amex #2, Amex #3
-        (amex1 or 0.0), (amex2 or 0.0), (amex3 or 0.0),
-        # Petty Cash Expense
-        (petty_cash or 0.0),
-        # Advance & Cash Wages
-        (deposit_minus or 0.0),
-        # Petty Cash / Advance Details
-        petty_cash_note,
-        # Deposit In
-        (deposit_plus or 0.0),
-        # Deposit Out
-        (deposit_minus or 0.0),
-        # Deposit Details Name Date In/Out
-        deposits,
-        # Deliveroo, Uber Eats, just
-        (deliveroo or 0.0), (ubereats or 0.0), "",
-        # CC Tips, Cash Tips
-        (tips_credit_card or 0.0), (cash_tips or 0.0),
-        # Difference
-        difference,
-        # CASH IN HAND
-        (money_i_have or 0.0),
-        # CC+SC+CASH
-        (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),
-        # Float
-        (float_val or 0.0),
-        # Deposits - Notes, Petty Cash - Notes, Notes, Managers
-        deposits, petty_cash_note, comments, manager
-    ] + images
+    # Satır gönder (Extended sheet)
+row = [
+    # Date
+    date_str,
+    # Z #NO
+    z_number,
+    # Gross, Net, Service Charge, Discount, Complimentary, Staff Food
+    (gross_total or 0.0), (net_total or 0.0), (service_charge or 0.0),
+    (discount_total or 0.0), (complimentary_total or 0.0), (staff_food or 0.0),
+    # Take-In
+    (calculated_taken_in or 0.0),
+    # Card #1, Card #2, Card #3
+    (cc1 or 0.0), (cc2 or 0.0), (cc3 or 0.0),
+    # Amex #1, Amex #2, Amex #3
+    (amex1 or 0.0), (amex2 or 0.0), (amex3 or 0.0),
+    # Petty Cash Expense
+    (petty_cash or 0.0),
+    # Advance & Cash Wages
+    (deposit_minus or 0.0),
+    # Petty Cash / Advance Details
+    petty_cash_note,
+    # Deposit In
+    (deposit_plus or 0.0),
+    # Deposit Out
+    (deposit_minus or 0.0),
+    # Deposit Details Name Date In/Out
+    deposits,
+    # Deliveroo, Uber Eats, just
+    (deliveroo or 0.0), (ubereats or 0.0), "",
+    # CC Tips, Cash Tips
+    (tips_credit_card or 0.0), (cash_tips or 0.0),
+    # Difference
+    difference,
+    # CASH IN HAND
+    (money_i_have or 0.0),
+    # CC+SC+CASH
+    (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),
+    # Float
+    (float_val or 0.0),
+    # Deposits - Notes, Petty Cash - Notes, Notes, Managers
+    deposits, petty_cash_note, comments, manager
+] + (photo_links + [""] * 6)[:6]
 
-    ] + images
-
+# Google Sheet'e ekle
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
     # Summary sheet
