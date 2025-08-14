@@ -7,16 +7,18 @@ from googleapiclient.http import MediaIoBaseUpload
 from google.oauth2.service_account import Credentials
 import json
 
-# Sayfa yapılandırması (EN ÜSTE)
+# Sayfa yapılandırması
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
-
 st.title("LPA - BANKING")
 
 st.markdown("You can enter detailed banking information by filling in the fields below.")
 today = datetime.date.today()
 date = st.date_input("Date", today)
 
-# Sayısal girişler (güvenli varsayılanlar)
+# Tarihi gün/ay/yıl formatına çevir
+date_str = date.strftime("%d/%m/%Y")
+
+# Sayısal girişler
 z_number = st.text_input("Z Number")
 gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="gross_total")
 net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="net_total")
@@ -43,7 +45,7 @@ ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value
 petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="petty_cash")
 deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="deposit_plus")
 
-# İSİM–ANAHTAR UYUMLU!
+# Doğru key eşleşmesi
 tips_sc = st.number_input("Service Charge Tips (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="tips_sc")
 tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=0.0, placeholder="0.00", key="tips_credit_card")
 
@@ -105,9 +107,9 @@ if submitted:
             ).execute()
             photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
 
-    # Satır gönder (None güvenli)
+    # Satır gönder
     row = [
-        str(date),
+        date_str,
         (gross_total or 0.0), (net_total or 0.0), (service_charge or 0.0), (discount_total or 0.0), (complimentary_total or 0.0),
         (staff_food or 0.0),
         (calculated_taken_in or 0.0),
@@ -129,7 +131,7 @@ if submitted:
     # İkinci sheet'e özet veri
     second_sheet = client.open("LPA Banking").worksheet("BANKING")
     summary_row = [
-        str(date),
+        date_str,
         (calculated_taken_in or 0.0),
         (service_charge or 0.0),
         (tips_credit_card or 0.0),
@@ -139,7 +141,7 @@ if submitted:
 
     st.session_state["form_submitted"] = True
 
-# Başarı mesajı → önce göster, sonra temizle
+# Başarı mesajı
 if st.session_state.get("form_submitted"):
     st.markdown(
         """
@@ -149,7 +151,6 @@ if st.session_state.get("form_submitted"):
         """,
         unsafe_allow_html=True
     )
-    # Mesaj bir kez görünsün:
     st.session_state.pop("form_submitted", None)
 
 
