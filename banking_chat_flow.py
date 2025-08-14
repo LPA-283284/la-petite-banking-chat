@@ -99,7 +99,7 @@ uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg",
 # FORM
 with st.form("banking_form"):
     petty_cash_note = st.text_area("Petty Cash Note")
-    notes = st.text_area("Notes")
+    deposit_details = st.text_area("Deposit Details Name Date In/Out")
     comments = st.text_area("Customer Reviews")
     manager = st.text_input("Manager")
     submitted = st.form_submit_button("Submit")
@@ -172,7 +172,7 @@ if submitted:
         (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
         (float_val or 0.0),                   # Float
         petty_cash_note,                      # Petty Cash - Notes
-        notes,                                # Notes
+        deposit_details,                      # Deposit Details Name Date In/Out
         manager                               # Managers
     ] + images                                # IMAGES -1 to IMAGES -6
 
