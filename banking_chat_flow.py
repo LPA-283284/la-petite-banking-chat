@@ -31,9 +31,6 @@ st.markdown("You can enter detailed banking information by filling in the fields
 today = datetime.date.today()
 date = st.date_input("Date", today)
 
-# Z Number (metin)
-z_number = st.text_input("Z Number")
-
 # Sayısal girişler (varsayılan 0.00; kullanıcı değiştirirse değerler hesaplara yansır)
 z_number = st.text_input("Z Number")
 gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
