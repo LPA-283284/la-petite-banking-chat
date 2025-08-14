@@ -99,7 +99,7 @@ uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg",
 # FORM
 with st.form("banking_form"):
     petty_cash_note = st.text_area("Petty Cash Note")
-    notes = st.text_area("Notes")
+    deposit_details = st.text_area("Deposit Details")
     comments = st.text_area("Customer Reviews")
     manager = st.text_input("Manager")
     submitted = st.form_submit_button("Submit")
@@ -161,7 +161,7 @@ if submitted:
         petty_cash_note,                      # Petty Cash / Advance Details
         (deposit_plus or 0.0),                # Deposit In
         (deposit_minus or 0.0),               # Deposit Out
-        notes,                                # Deposit Details Name Date In/Out
+        deposit_details,                      # Deposit Details Name Date In/Out
         (deliveroo or 0.0),                   # Deliveroo
         (ubereats or 0.0),                    # Uber Eats
         "",                                   # just
