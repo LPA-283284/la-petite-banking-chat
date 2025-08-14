@@ -181,3 +181,16 @@ if submitted:
     second_sheet.append_row(summary_row, value_input_option="USER_ENTERED")
 
     st.session_state["form_submitted"] = True
+
+# Başarı mesajı
+if st.session_state.get("form_submitted"):
+    st.markdown(
+        """
+        <div style="background-color:#d4edda;padding:20px;border-radius:10px;border:1px solid #c3e6cb;">
+            <h4 style="color:#155724;">✅ All information and images sent successfully!</h4>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    st.session_state.pop("form_submitted", None)
+
