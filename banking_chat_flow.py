@@ -172,7 +172,7 @@ if submitted:
         (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
         (float_val or 0.0),                   # Float
         petty_cash_note,                      # Petty Cash - Notes
-        deposit_details,                      # Deposit Details Name Date In/Out
+        notes,                                # Notes
         manager                               # Managers
     ] + images                                # IMAGES -1 to IMAGES -6
 
