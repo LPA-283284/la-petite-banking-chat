@@ -90,7 +90,9 @@ if st.session_state.cash_in_hand_first_edit and cash_in_hand != 0.0:
 difference = (cash_in_hand or 0.0) - (remaining_custom or 0.0)
 st.markdown(f"**Difference:** £{difference:.2f}")
 
-st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
+cash_in_envelope_total = (cash_in_hand or 0.0) + (cash_tips or 0.0)
+st.markdown(f"### 💰 Cash in Envelope Total: £{cash_in_envelope_total:.2f}")
+
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
 # Görsel yükleme
