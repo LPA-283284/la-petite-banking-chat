@@ -156,7 +156,6 @@ if submitted:
         (voucher or 0.0),                     # Voucher
         (petty_cash or 0.0),                  # Petty Cash Expense
         (advance_cash_wages or 0.0),          # Advance & Cash Wages
-        petty_cash_note,                      # Petty Cash / Advance Details
         (deposit_plus or 0.0),                # Deposit In
         (deposit_minus or 0.0),               # Deposit Out
         deposit_details,                      # Deposit Details Name Date In/Out
