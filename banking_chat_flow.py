@@ -168,7 +168,7 @@ if submitted:
         (tips_credit_card or 0.0),            # CC Tips
         (cash_tips or 0.0),                   # Cash Tips
         difference,                           # Difference
-        (money_i_have or 0.0),                # CASH IN HAND
+        (cash_in_hand or 0.0),                # CASH IN HAND
         (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
         (float_val or 0.0),                   # Float
         petty_cash_note,                      # Petty Cash - Notes
