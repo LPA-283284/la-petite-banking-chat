@@ -6,6 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 from google.oauth2.service_account import Credentials
 import json
+import io
 
 # Sayfa yapılandırması
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
