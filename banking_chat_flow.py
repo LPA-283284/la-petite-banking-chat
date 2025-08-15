@@ -112,26 +112,36 @@ if submitted:
     sheet = client.open("La Petite Banking Extended")
     banking_sheet = sheet.worksheet("BANKING")
 
-    # Drive upload
-    photo_links = []
-    if uploaded_files:
-        creds_drive = Credentials.from_service_account_info(
-            json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
-            scopes=["https://www.googleapis.com/auth/drive"]
-        )
-        drive_service = build('drive', 'v3', credentials=creds_drive)
-        for file in uploaded_files:
-            media = MediaIoBaseUpload(file, mimetype=file.type)
-            uploaded = drive_service.files().create(
-                body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"]},
-                media_body=media,
-                fields="id"
-            ).execute()
-            drive_service.permissions().create(
-                fileId=uploaded["id"],
-                body={"type": "anyone", "role": "reader"}
-            ).execute()
-            photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
+    import io
+
+# Drive upload
+photo_links = []
+if uploaded_files:
+    creds_drive = Credentials.from_service_account_info(
+        json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
+        scopes=["https://www.googleapis.com/auth/drive"]
+    )
+    drive_service = build('drive', 'v3', credentials=creds_drive)
+
+    for file in uploaded_files:
+        # Streamlit UploadedFile → BytesIO
+        file_bytes = io.BytesIO(file.getbuffer())
+
+        # Mimetype boşsa varsayılan kullan
+        media = MediaIoBaseUpload(file_bytes, mimetype=file.type or 'application/octet-stream')
+
+        uploaded = drive_service.files().create(
+            body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"]},
+            media_body=media,
+            fields="id"
+        ).execute()
+
+        drive_service.permissions().create(
+            fileId=uploaded["id"],
+            body={"type": "anyone", "role": "reader"}
+        ).execute()
+
+        photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
 
     images = (photo_links + [""] * 6)[:6]
 
