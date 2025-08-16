@@ -101,6 +101,7 @@ uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg",
 # FORM
 with st.form("banking_form"):
     deposit_details = st.text_area("Deposit Details Name Date In/Out")
+    petty_cash = st.text_area("Patty Cash / Advance Details")
     manager = st.text_input("Manager")
     submitted = st.form_submit_button("Submit")
 
@@ -158,6 +159,7 @@ if submitted:
         (voucher or 0.0),                     # Voucher
         (petty_cash or 0.0),                  # Petty Cash Expense
         (advance_cash_wages or 0.0),          # Advance & Cash Wages
+        petty_cash_note,                      # Petty Cash / Advance Details
         (deposit_plus or 0.0),                # Deposit In
         (deposit_minus or 0.0),               # Deposit Out
         deposit_details,                      # Deposit Details Name Date In/Out
