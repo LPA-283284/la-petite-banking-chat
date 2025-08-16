@@ -100,8 +100,8 @@ uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg",
 
 # FORM
 with st.form("banking_form"):
-    petty_cash_note = st.text_area("Petty Cash / Advance Details")
     deposit_details = st.text_area("Deposit Details Name Date In/Out")
+    petty_cash_note = st.text_area("Petty Cash / Advance Details")
     manager = st.text_input("Manager")
     submitted = st.form_submit_button("Submit")
 
