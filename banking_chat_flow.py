@@ -139,39 +139,41 @@ if submitted:
 
     # Satır gönder (Extended sheet)
     row = [
-        date_str,                             # Date
-        z_number,                             # Z #NO
-        (gross_total or 0.0),                 # Gross
-        (net_total or 0.0),                   # Net
-        (service_charge or 0.0),              # Service Charge
-        (discount_total or 0.0),              # Discount
-        (complimentary_total or 0.0),         # Complimentary
-        (staff_food or 0.0),                  # Staff Food
-        (calculated_taken_in or 0.0),         # Take-In
-        (cc1 or 0.0),                         # Card #1
-        (cc2 or 0.0),                         # Card #2
-        (cc3 or 0.0),                         # Card #3
-        (amex1 or 0.0),                       # Amex #1
-        (amex2 or 0.0),                       # Amex #2
-        (amex3 or 0.0),                       # Amex #3
-        (voucher or 0.0),                     # Voucher
-        (petty_cash or 0.0),                  # Petty Cash Expense
-        (advance_cash_wages or 0.0),          # Advance & Cash Wages
-        petty_cash_note,                      # Petty Cash / Advance Details
-        (deposit_plus or 0.0),                # Deposit In
-        (deposit_minus or 0.0),               # Deposit Out
-        deposit_details,                      # Deposit Details Name Date In/Out
-        (deliveroo or 0.0),                   # Deliveroo
-        (ubereats or 0.0),                    # Uber Eats
-        "",                                   # just
-        (tips_credit_card or 0.0),            # CC Tips
-        (cash_tips or 0.0),                   # Cash Tips
-        difference,                           # Difference
-        (cash_in_hand or 0.0),                # CASH IN HAND
-        (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
-        (float_val or 0.0),                   # Float
-        manager                               # Managers
-    ] + images                                # IMAGES -1 to IMAGES -6
+    date_str,                             # Date
+    z_number,                             # Z #NO
+    (gross_total or 0.0),                 # Gross
+    (net_total or 0.0),                   # Net
+    (service_charge or 0.0),              # Service Charge
+    (discount_total or 0.0),              # Discount
+    (complimentary_total or 0.0),         # Complimentary
+    (staff_food or 0.0),                  # Staff Food
+    (calculated_taken_in or 0.0),         # Take-In
+    (cc1 or 0.0),                         # Card #1
+    (cc2 or 0.0),                         # Card #2
+    (cc3 or 0.0),                         # Card #3
+    (amex1 or 0.0),                       # Amex #1
+    (amex2 or 0.0),                       # Amex #2
+    (amex3 or 0.0),                       # Amex #3
+    (voucher or 0.0),                     # Voucher
+    (petty_cash or 0.0),                  # Petty Cash Expense
+    (advance_cash_wages or 0.0),          # Advance & Cash Wages
+    petty_cash_note,                      # Petty Cash / Advance Details
+    (deposit_plus or 0.0),                # Deposit In
+    (deposit_minus or 0.0),               # Deposit Out
+    deposit_details,                      # Deposit Details Name Date In/Out
+    (deliveroo or 0.0),                   # Deliveroo
+    (ubereats or 0.0),                    # Uber Eats
+    "",                                   # Just
+    (tips_credit_card or 0.0),            # CC Tips
+    (cash_tips or 0.0),                   # Cash Tips
+    difference,                           # Difference
+    (cash_in_hand or 0.0),                # CASH IN HAND
+    (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
+    (float_val or 0.0),                   # Float
+    petty_cash_note,                      # Petty Cash - Notes
+    manager                               # Managers
+] + images                                # IMAGES -1 to IMAGES -6
+
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
