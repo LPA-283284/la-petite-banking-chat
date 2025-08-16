@@ -40,11 +40,11 @@ amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None,
 amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex3")
 voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="voucher")
 advance_cash_wages = st.number_input("Advance & Cash Wages (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="advance_cash_wages")
-deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_minus")
+deposit_out = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_out")
 deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deliveroo")
 ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="ubereats")
 petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="petty_cash")
-deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
+deposit_in = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_in")
 tips_sc = st.number_input(
     "Service Charge Tips (£)",
     min_value=0.0,
@@ -59,10 +59,10 @@ tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f",
 deducted_items = (
     (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
     (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
-    (voucher or 0.0) + (deposit_minus or 0.0) +
+    (voucher or 0.0) + (deposit_out or 0.0) +
     (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
 )
-added_items = (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
+added_items = (deposit_in or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
 remaining_custom = (calculated_taken_in or 0.0) - (deducted_items or 0.0) + (added_items or 0.0)
 
 float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=75.00, placeholder="75.00", key="float_val")
@@ -90,15 +90,12 @@ if st.session_state.cash_in_hand_first_edit and cash_in_hand != 0.0:
 difference = (cash_in_hand or 0.0) - (remaining_custom or 0.0)
 st.markdown(f"**Difference:** £{difference:.2f}")
 
-cash_in_envelope_total = (cash_in_hand or 0.0) + (cash_tips or 0.0)
-st.markdown(f"### 💰 Cash in Envelope Total: £{cash_in_envelope_total:.2f}")
-
+st.markdown(f"### 💰 Cash in Envelope Total: £{(remaining_custom or 0.0) + (cash_tips or 0.0):.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
 # Görsel yükleme
 uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
-# FORM
 # FORM
 with st.form("banking_form"):
     petty_cash_note = st.text_area("Petty Cash Note")
@@ -138,7 +135,7 @@ if submitted:
 
     images = (photo_links + [""] * 6)[:6]
 
-    # Satır gönder (Extended sheet) — senin istediğin başlık sırası
+    # Satır gönder (Extended sheet)
     row = [
         date_str,                             # Date
         z_number,                             # Z #NO
@@ -159,8 +156,8 @@ if submitted:
         (petty_cash or 0.0),                  # Petty Cash Expense
         (advance_cash_wages or 0.0),          # Advance & Cash Wages
         petty_cash_note,                      # Petty Cash / Advance Details
-        (deposit_plus or 0.0),                # Deposit In
-        (deposit_minus or 0.0),               # Deposit Out
+        (deposit_in or 0.0),                  # Deposit In
+        (deposit_out or 0.0),                 # Deposit Out
         deposit_details,                      # Deposit Details Name Date In/Out
         (deliveroo or 0.0),                   # Deliveroo
         (ubereats or 0.0),                    # Uber Eats
@@ -172,11 +169,9 @@ if submitted:
         (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
         (float_val or 0.0),                   # Float
         manager                               # Managers
-    ] + images
+    ] + images                                # IMAGES -1 to IMAGES -6
 
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
-
-
 
     # İkinci sheet'e özet veri
     second_sheet = client.open("LPA Banking").worksheet("BANKING")
