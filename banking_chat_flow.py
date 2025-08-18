@@ -12,8 +12,8 @@ from gspread.exceptions import APIError
 
 # === SHEET ID'LERI ===
 # /d/<ID>/ kismindaki degerler
-EXTENDED_SHEET_ID = "283284"      # La Petite Banking Extended
-PRIMARY_SHEET_ID  = "283284-1"    # LPA Banking (summary)
+EXTENDED_SHEET_ID = "1_zeZ1TKUxnOdsLnFADWk7GTOlMlmP-mQ1ovmwJHxLC0"   # Lpa Banking Extende
+PRIMARY_SHEET_ID  = "1FX_qVFBtuX6eWgHxbMpGQcHYhj5s-NFnVV0I3XbjwhQ"   # Lpa Banking
 
 # === Basit retry yardimcilari ===
 def open_ws_by_key(client, key, worksheet_name=None, tries=4, base_delay=0.6):
@@ -117,7 +117,7 @@ cash_in_hand = st.number_input(
 if st.session_state.cash_in_hand_first_edit and cash_in_hand != 0.0:
     st.session_state.cash_in_hand_first_edit = False
 
-# Fark + Zarf toplamı
+# Fark + Zarf toplami
 difference = (cash_in_hand or 0.0) - (remaining_custom or 0.0)
 st.markdown(f"**Difference:** £{difference:.2f}")
 
@@ -189,52 +189,4 @@ if submitted:
         (cc2 or 0.0),                         # Card #2
         (cc3 or 0.0),                         # Card #3
         (amex1 or 0.0),                       # Amex #1
-        (amex2 or 0.0),                       # Amex #2
-        (amex3 or 0.0),                       # Amex #3
-        (voucher or 0.0),                     # Voucher
-        (petty_cash or 0.0),                  # Petty Cash Expense
-        (advance_cash_wages or 0.0),          # Advance & Cash Wages
-        petty_cash_note,                      # Petty Cash / Advance Details
-        (deposit_plus or 0.0),                # Deposit In
-        (deposit_minus or 0.0),               # Deposit Out
-        deposit_details,                      # Deposit Details Name Date In/Out
-        (deliveroo or 0.0),                   # Deliveroo
-        (ubereats or 0.0),                    # Uber Eats
-        "",                                   # Just
-        (tips_credit_card or 0.0),            # CC Tips
-        (cash_tips or 0.0),                   # Cash Tips
-        difference,                           # Difference
-        (cash_in_hand or 0.0),                # CASH IN HAND
-        (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
-        (float_val or 0.0),                   # Float
-        manager                               # Managers
-    ] + images                                # IMAGES -1 .. -6
-
-    # Row ekleme (retry'li)
-    append_row_retry(banking_sheet, row)
-
-    # Ikinci sheet: ID ile ve retry'li
-    second_sheet = open_ws_by_key(client, PRIMARY_SHEET_ID, "BANKING")
-    summary_row = [
-        date_str,
-        (calculated_taken_in or 0.0),
-        (service_charge or 0.0),
-        (tips_credit_card or 0.0),
-        (cash_tips or 0.0),
-        (cash_in_hand or 0.0)
-    ]
-    append_row_retry(second_sheet, summary_row)
-
-    st.session_state["form_submitted"] = True
-
-# Basari mesaji
-if st.session_state.get("form_submitted"):
-    st.markdown(
-        """
-        <div style="background-color:#d4edda;padding:20px;border-radius:10px;border:1px solid #c3e6cb;">
-            <h4 style="color:#155724;">✅ All information and images sent successfully!</h4>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    st.session_state.pop("form_submitted", None)
+        (ame
