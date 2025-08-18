@@ -6,6 +6,35 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 from google.oauth2.service_account import Credentials
 import json
+import io
+import time
+from gspread.exceptions import APIError
+
+# === Sheet ID'leri (URL'deki /d/<ID>/ kısmı) ===
+# İstersen bunları st.secrets içine koy: EXTENDED_SHEET_ID, PRIMARY_SHEET_ID
+EXTENDED_SHEET_ID = st.secrets.get("EXTENDED_SHEET_ID", "PASTE_EXTENDED_SHEET_ID")
+PRIMARY_SHEET_ID  = st.secrets.get("PRIMARY_SHEET_ID",  "PASTE_PRIMARY_SHEET_ID")
+
+# === Basit retry yardımcıları ===
+def open_ws_by_key(client, key, worksheet_name=None, tries=4, base_delay=0.6):
+    for i in range(tries):
+        try:
+            sh = client.open_by_key(key)
+            return sh.worksheet(worksheet_name) if worksheet_name else sh
+        except APIError:
+            if i == tries - 1:
+                raise
+            time.sleep(base_delay * (2 ** i))
+
+def append_row_retry(worksheet, row, tries=4, base_delay=0.6):
+    for i in range(tries):
+        try:
+            worksheet.append_row(row, value_input_option="USER_ENTERED")
+            return
+        except APIError:
+            if i == tries - 1:
+                raise
+            time.sleep(base_delay * (2 ** i))
 
 # Sayfa yapılandırması
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
@@ -45,6 +74,8 @@ deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", valu
 ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="ubereats")
 petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="petty_cash")
 deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
+
+# Service Charge Tips, üstteki service_charge'a otomatik bağlandı
 tips_sc = st.number_input(
     "Service Charge Tips (£)",
     min_value=0.0,
@@ -55,11 +86,11 @@ tips_sc = st.number_input(
 )
 tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
 
-# Özet
+# Özet (Advance & Cash Wages dahil edildi)
 deducted_items = (
     (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
     (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
-    (voucher or 0.0) + (deposit_minus or 0.0) +
+    (voucher or 0.0) + (deposit_minus or 0.0) + (advance_cash_wages or 0.0) +
     (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
 )
 added_items = (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
@@ -86,11 +117,10 @@ cash_in_hand = st.number_input(
 if st.session_state.cash_in_hand_first_edit and cash_in_hand != 0.0:
     st.session_state.cash_in_hand_first_edit = False
 
-# Fark hesaplama
+# Fark + Zarf Toplamı
 difference = (cash_in_hand or 0.0) - (remaining_custom or 0.0)
 st.markdown(f"**Difference:** £{difference:.2f}")
 
-# Cash in Envelope Total (düzeltilmiş)
 cash_in_envelope_total = (cash_in_hand or 0.0) + (cash_tips or 0.0)
 st.markdown(f"### 💰 Cash in Envelope Total: £{cash_in_envelope_total:.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
@@ -111,8 +141,9 @@ if submitted:
         scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
     )
     client = gspread.authorize(creds)
-    sheet = client.open("283284")
-    banking_sheet = sheet.worksheet("BANKING")
+
+    # Extended sheet (ID ile) + worksheet retry
+    banking_sheet = 283284(client, EXTENDED_SHEET_ID, "BANKING")
 
     # Drive upload
     photo_links = []
@@ -122,62 +153,68 @@ if submitted:
             scopes=["https://www.googleapis.com/auth/drive"]
         )
         drive_service = build('drive', 'v3', credentials=creds_drive)
+
         for file in uploaded_files:
-            media = MediaIoBaseUpload(file, mimetype=file.type)
+            # Streamlit UploadedFile → BytesIO; mimetype yedeği
+            file_bytes = io.BytesIO(file.getbuffer())
+            media = MediaIoBaseUpload(file_bytes, mimetype=(file.type or "application/octet-stream"))
+
             uploaded = drive_service.files().create(
                 body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"]},
                 media_body=media,
                 fields="id"
             ).execute()
+
             drive_service.permissions().create(
                 fileId=uploaded["id"],
                 body={"type": "anyone", "role": "reader"}
             ).execute()
+
             photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
 
     images = (photo_links + [""] * 6)[:6]
 
-    # Satır gönder (Extended sheet)
+    # Satır gönder (Extended sheet) — İSTEDİĞİN SIRA
     row = [
-    date_str,                             # Date
-    z_number,                             # Z #NO
-    (gross_total or 0.0),                 # Gross
-    (net_total or 0.0),                   # Net
-    (service_charge or 0.0),              # Service Charge
-    (discount_total or 0.0),              # Discount
-    (complimentary_total or 0.0),         # Complimentary
-    (staff_food or 0.0),                  # Staff Food
-    (calculated_taken_in or 0.0),         # Take-In
-    (cc1 or 0.0),                         # Card #1
-    (cc2 or 0.0),                         # Card #2
-    (cc3 or 0.0),                         # Card #3
-    (amex1 or 0.0),                       # Amex #1
-    (amex2 or 0.0),                       # Amex #2
-    (amex3 or 0.0),                       # Amex #3
-    (voucher or 0.0),                     # Voucher
-    (petty_cash or 0.0),                  # Petty Cash Expense
-    (advance_cash_wages or 0.0),          # Advance & Cash Wages
-    petty_cash_note,                      # Petty Cash / Advance Details
-    (deposit_plus or 0.0),                # Deposit In
-    (deposit_minus or 0.0),               # Deposit Out
-    deposit_details,                      # Deposit Details Name Date In/Out
-    (deliveroo or 0.0),                   # Deliveroo
-    (ubereats or 0.0),                    # Uber Eats
-    "",                                   # Just
-    (tips_credit_card or 0.0),            # CC Tips
-    (cash_tips or 0.0),                   # Cash Tips
-    difference,                           # Difference
-    (cash_in_hand or 0.0),                # CASH IN HAND
-    (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
-    (float_val or 0.0),                   # Float
-    manager                               # Managers
-] + images                                # IMAGES -1 to IMAGES -6
+        date_str,                             # Date
+        z_number,                             # Z #NO
+        (gross_total or 0.0),                 # Gross
+        (net_total or 0.0),                   # Net
+        (service_charge or 0.0),              # Service Charge
+        (discount_total or 0.0),              # Discount
+        (complimentary_total or 0.0),         # Complimentary
+        (staff_food or 0.0),                  # Staff Food
+        (calculated_taken_in or 0.0),         # Take-In
+        (cc1 or 0.0),                         # Card #1
+        (cc2 or 0.0),                         # Card #2
+        (cc3 or 0.0),                         # Card #3
+        (amex1 or 0.0),                       # Amex #1
+        (amex2 or 0.0),                       # Amex #2
+        (amex3 or 0.0),                       # Amex #3
+        (voucher or 0.0),                     # Voucher
+        (petty_cash or 0.0),                  # Petty Cash Expense
+        (advance_cash_wages or 0.0),          # Advance & Cash Wages
+        petty_cash_note,                      # Petty Cash / Advance Details
+        (deposit_plus or 0.0),                # Deposit In
+        (deposit_minus or 0.0),               # Deposit Out
+        deposit_details,                      # Deposit Details Name Date In/Out
+        (deliveroo or 0.0),                   # Deliveroo
+        (ubereats or 0.0),                    # Uber Eats
+        "",                                   # Just
+        (tips_credit_card or 0.0),            # CC Tips
+        (cash_tips or 0.0),                   # Cash Tips
+        difference,                           # Difference
+        (cash_in_hand or 0.0),                # CASH IN HAND
+        (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),  # CC+SC+CASH
+        (float_val or 0.0),                   # Float
+        manager                               # Managers
+    ] + images                                # IMAGES -1 .. -6
 
+    # Row ekleme (retry'li)
+    append_row_retry(banking_sheet, row)
 
-    banking_sheet.append_row(row, value_input_option="USER_ENTERED")
-
-    # İkinci sheet'e özet veri
-    second_sheet = client.open("283284-1").worksheet("BANKING")
+    # İkinci sheet: ID ile ve retry'li
+    second_sheet = 283284-1(client, PRIMARY_SHEET_ID, "BANKING")
     summary_row = [
         date_str,
         (calculated_taken_in or 0.0),
@@ -186,7 +223,7 @@ if submitted:
         (cash_tips or 0.0),
         (cash_in_hand or 0.0)
     ]
-    second_sheet.append_row(summary_row, value_input_option="USER_ENTERED")
+    append_row_retry(second_sheet, summary_row)
 
     st.session_state["form_submitted"] = True
 
