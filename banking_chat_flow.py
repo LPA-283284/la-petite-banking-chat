@@ -111,7 +111,7 @@ if submitted:
         scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
     )
     client = gspread.authorize(creds)
-    sheet = client.open("La Petite Banking Extended")
+    sheet = client.open("283284")
     banking_sheet = sheet.worksheet("BANKING")
 
     # Drive upload
@@ -177,7 +177,7 @@ if submitted:
     banking_sheet.append_row(row, value_input_option="USER_ENTERED")
 
     # İkinci sheet'e özet veri
-    second_sheet = client.open("LPA Banking").worksheet("BANKING")
+    second_sheet = client.open("283284-1").worksheet("BANKING")
     summary_row = [
         date_str,
         (calculated_taken_in or 0.0),
