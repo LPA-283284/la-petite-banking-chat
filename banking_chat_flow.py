@@ -10,12 +10,12 @@ import io
 import time
 from gspread.exceptions import APIError
 
-# === Sheet ID'leri (URL'deki /d/<ID>/ kısmı) ===
-# İstersen bunları st.secrets içine koy: EXTENDED_SHEET_ID, PRIMARY_SHEET_ID
-EXTENDED_SHEET_ID = st.secrets.get("EXTENDED_SHEET_ID", "PASTE_EXTENDED_SHEET_ID")
-PRIMARY_SHEET_ID  = st.secrets.get("PRIMARY_SHEET_ID",  "PASTE_PRIMARY_SHEET_ID")
+# === SHEET ID'LERI ===
+# /d/<ID>/ kismindaki degerler
+EXTENDED_SHEET_ID = "283284"      # La Petite Banking Extended
+PRIMARY_SHEET_ID  = "283284-1"    # LPA Banking (summary)
 
-# === Basit retry yardımcıları ===
+# === Basit retry yardimcilari ===
 def open_ws_by_key(client, key, worksheet_name=None, tries=4, base_delay=0.6):
     for i in range(tries):
         try:
@@ -36,7 +36,7 @@ def append_row_retry(worksheet, row, tries=4, base_delay=0.6):
                 raise
             time.sleep(base_delay * (2 ** i))
 
-# Sayfa yapılandırması
+# Sayfa yapilandirmasi
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
 st.title("LPA - BANKING")
 
@@ -44,10 +44,10 @@ st.markdown("You can enter detailed banking information by filling in the fields
 today = datetime.date.today()
 date = st.date_input("Date", today)
 
-# Tarihi gün/ay/yıl formatına çevir
+# Tarihi gun/ay/yil formatina cevir
 date_str = date.strftime("%d/%m/%Y")
 
-# Sayısal girişler
+# Sayisal girisler
 z_number = st.text_input("Z Number")
 gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
 net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="net_total")
@@ -60,7 +60,7 @@ staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", va
 calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
-# Diğer ödemeler
+# Diger odemeler
 cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc1")
 cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc2")
 cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc3")
@@ -75,7 +75,7 @@ ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value
 petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="petty_cash")
 deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
 
-# Service Charge Tips, üstteki service_charge'a otomatik bağlandı
+# Service Charge Tips — ustteki service_charge'a bagli
 tips_sc = st.number_input(
     "Service Charge Tips (£)",
     min_value=0.0,
@@ -86,7 +86,7 @@ tips_sc = st.number_input(
 )
 tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
 
-# Özet (Advance & Cash Wages dahil edildi)
+# Ozet (Advance & Cash Wages DAHIL)
 deducted_items = (
     (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
     (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
@@ -101,7 +101,7 @@ cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", valu
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 
-# Cash In Hand (ilk dokunuşta 0.00 temizleme)
+# Cash In Hand (ilk dokunusta 0.00 temizleme)
 if "cash_in_hand_first_edit" not in st.session_state:
     st.session_state.cash_in_hand_first_edit = True
 
@@ -117,7 +117,7 @@ cash_in_hand = st.number_input(
 if st.session_state.cash_in_hand_first_edit and cash_in_hand != 0.0:
     st.session_state.cash_in_hand_first_edit = False
 
-# Fark + Zarf Toplamı
+# Fark + Zarf toplamı
 difference = (cash_in_hand or 0.0) - (remaining_custom or 0.0)
 st.markdown(f"**Difference:** £{difference:.2f}")
 
@@ -125,7 +125,7 @@ cash_in_envelope_total = (cash_in_hand or 0.0) + (cash_tips or 0.0)
 st.markdown(f"### 💰 Cash in Envelope Total: £{cash_in_envelope_total:.2f}")
 st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
-# Görsel yükleme
+# Gorsel yukleme
 uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
 
 # FORM
@@ -143,7 +143,7 @@ if submitted:
     client = gspread.authorize(creds)
 
     # Extended sheet (ID ile) + worksheet retry
-    banking_sheet = 283284(client, EXTENDED_SHEET_ID, "BANKING")
+    banking_sheet = open_ws_by_key(client, EXTENDED_SHEET_ID, "BANKING")
 
     # Drive upload
     photo_links = []
@@ -155,7 +155,7 @@ if submitted:
         drive_service = build('drive', 'v3', credentials=creds_drive)
 
         for file in uploaded_files:
-            # Streamlit UploadedFile → BytesIO; mimetype yedeği
+            # Streamlit UploadedFile → BytesIO; mimetype yedegi
             file_bytes = io.BytesIO(file.getbuffer())
             media = MediaIoBaseUpload(file_bytes, mimetype=(file.type or "application/octet-stream"))
 
@@ -174,7 +174,7 @@ if submitted:
 
     images = (photo_links + [""] * 6)[:6]
 
-    # Satır gönder (Extended sheet) — İSTEDİĞİN SIRA
+    # Satir gonder (Extended sheet) — ISTEDIGIN SIRA
     row = [
         date_str,                             # Date
         z_number,                             # Z #NO
@@ -213,8 +213,8 @@ if submitted:
     # Row ekleme (retry'li)
     append_row_retry(banking_sheet, row)
 
-    # İkinci sheet: ID ile ve retry'li
-    second_sheet = 283284-1(client, PRIMARY_SHEET_ID, "BANKING")
+    # Ikinci sheet: ID ile ve retry'li
+    second_sheet = open_ws_by_key(client, PRIMARY_SHEET_ID, "BANKING")
     summary_row = [
         date_str,
         (calculated_taken_in or 0.0),
@@ -227,7 +227,7 @@ if submitted:
 
     st.session_state["form_submitted"] = True
 
-# Başarı mesajı
+# Basari mesaji
 if st.session_state.get("form_submitted"):
     st.markdown(
         """
