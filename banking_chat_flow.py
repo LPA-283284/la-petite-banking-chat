@@ -12,7 +12,7 @@ from gspread.exceptions import APIError
 
 # === SHEET ID'LERI ===
 # /d/<ID>/ kismindaki degerler
-EXTENDED_SHEET_ID = "1_zeZ1TKUxnOdsLnFADWk7GTOlMlmP-mQ1ovmwJHxLC0"   # Lpa Banking Extende
+EXTENDED_SHEET_ID = "1_zeZ1TKUxnOdsLnFADWk7GTOlMlmP-mQ1ovmwJHxLC0"   # Lpa Banking - Office
 PRIMARY_SHEET_ID  = "1FX_qVFBtuX6eWgHxbMpGQcHYhj5s-NFnVV0I3XbjwhQ"   # Lpa Banking
 
 # === Basit retry yardimcilari ===
