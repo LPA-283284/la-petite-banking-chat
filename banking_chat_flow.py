@@ -36,8 +36,8 @@ def append_row_retry(worksheet, row, tries=4, base_delay=0.6):
             time.sleep(base_delay * (2 ** i))
 
 # Yardimci: text_input'tan float'a cevir
-def float_input(label, key, placeholder="0.00", default=0.0):
-    val_str = st.text_input(label, placeholder=placeholder, key=key)
+def float_input(label, key, placeholder="0.00", default=0.0, value=None):
+    val_str = st.text_input(label, placeholder=placeholder, key=key, value=value if value is not None else "")
     try:
         return float(val_str) if val_str else default
     except ValueError:
@@ -82,8 +82,8 @@ ubereats = float_input("Uber Eats (£)", key="ubereats")
 petty_cash = float_input("Petty Cash (£)", key="petty_cash")
 deposit_plus = float_input("Deposit ( + ) (£)", key="deposit_plus")
 
-# Service Charge Tips — ustteki service_charge'a bagli
-tips_sc = float_input("Service Charge Tips (£)", key="tips_sc", default=service_charge if service_charge else 0.0)
+# Service Charge Tips — otomatik service_charge değerini alsın
+tips_sc = float_input("Service Charge Tips (£)", key="tips_sc", default=0.0, value=str(service_charge) if service_charge else "0.0")
 tips_credit_card = float_input("CC Tips (£)", key="tips_credit_card")
 
 # Ozet (Advance & Cash Wages DAHIL)
