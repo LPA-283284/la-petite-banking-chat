@@ -49,7 +49,7 @@ date_str = date.strftime("%d/%m/%Y")
 
 # Sayisal girisler
 z_number = st.text_input("Z Number")
-gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
+gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=0.00, placeholder="0.00", key="gross_total")
 net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="net_total")
 service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="service_charge")
 discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
