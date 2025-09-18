@@ -11,6 +11,7 @@ import time
 from gspread.exceptions import APIError
 
 # === SHEET ID'LERI ===
+# /d/<ID>/ kismindaki degerler
 EXTENDED_SHEET_ID = "1_zeZ1TKUxnOdsLnFADWk7GTOlMlmP-mQ1ovmwJHxLC0"   # Lpa Banking - Office
 PRIMARY_SHEET_ID  = "1FX_qVFBtuX6eWgHxbMpGQcHYhj5s-NFnVV0I3XbjwhQ"   # Lpa Banking
 
@@ -35,14 +36,6 @@ def append_row_retry(worksheet, row, tries=4, base_delay=0.6):
                 raise
             time.sleep(base_delay * (2 ** i))
 
-# Yardimci: text_input'tan float'a cevir
-def float_input(label, key, placeholder="0.00", default=0.0, value=None):
-    val_str = st.text_input(label, placeholder=placeholder, key=key, value=value if value is not None else "")
-    try:
-        return float(val_str) if val_str else default
-    except ValueError:
-        return default
-
 # Sayfa yapilandirmasi
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
 st.title("LPA - BANKING")
@@ -56,60 +49,81 @@ date_str = date.strftime("%d/%m/%Y")
 
 # Sayisal girisler
 z_number = st.text_input("Z Number")
-gross_total = float_input("Gross (£)", key="gross_total")
-net_total = float_input("Net (£)", key="net_total")
-service_charge = float_input("Service Charge (£)", key="service_charge")
-discount_total = float_input("Discount (£)", key="discount_total")
-complimentary_total = float_input("Complimentary (£)", key="complimentary_total")
-staff_food = float_input("Staff Food (£)", key="staff_food")
+gross_total = st.number_input("Gross (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="gross_total")
+net_total = st.number_input("Net (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="net_total")
+service_charge = st.number_input("Service Charge (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="service_charge")
+discount_total = st.number_input("Discount (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="discount_total")
+complimentary_total = st.number_input("Complimentary (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="complimentary_total")
+staff_food = st.number_input("Staff Food (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="staff_food")
 
 # Hesaplama
-calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
+calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
 # Diger odemeler
-cc1 = float_input("CC 1 (£)", key="cc1")
-cc2 = float_input("CC 2 (£)", key="cc2")
-cc3 = float_input("CC 3 (£)", key="cc3")
-amex1 = float_input("Amex 1 (£)", key="amex1")
-amex2 = float_input("Amex 2 (£)", key="amex2")
-amex3 = float_input("Amex 3 (£)", key="amex3")
-voucher = float_input("Voucher (£)", key="voucher")
-advance_cash_wages = float_input("Advance & Cash Wages (£)", key="advance_cash_wages")
-deposit_minus = float_input("Deposit ( - ) (£)", key="deposit_minus")
-deliveroo = float_input("Deliveroo (£)", key="deliveroo")
-ubereats = float_input("Uber Eats (£)", key="ubereats")
-petty_cash = float_input("Petty Cash (£)", key="petty_cash")
-deposit_plus = float_input("Deposit ( + ) (£)", key="deposit_plus")
+cc1 = st.number_input("CC 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc1")
+cc2 = st.number_input("CC 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc2")
+cc3 = st.number_input("CC 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cc3")
+amex1 = st.number_input("Amex 1 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex1")
+amex2 = st.number_input("Amex 2 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex2")
+amex3 = st.number_input("Amex 3 (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="amex3")
+voucher = st.number_input("Voucher (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="voucher")
+advance_cash_wages = st.number_input("Advance & Cash Wages (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="advance_cash_wages")
+deposit_minus = st.number_input("Deposit ( - ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_minus")
+deliveroo = st.number_input("Deliveroo (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deliveroo")
+ubereats = st.number_input("Uber Eats (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="ubereats")
+petty_cash = st.number_input("Petty Cash (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="petty_cash")
+deposit_plus = st.number_input("Deposit ( + ) (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="deposit_plus")
 
-# Service Charge Tips — otomatik service_charge değerini alsın
-tips_sc = float_input("Service Charge Tips (£)", key="tips_sc", default=0.0, value=str(service_charge) if service_charge else "0.0")
-tips_credit_card = float_input("CC Tips (£)", key="tips_credit_card")
+# Service Charge Tips — ustteki service_charge'a bagli
+tips_sc = st.number_input(
+    "Service Charge Tips (£)",
+    min_value=0.0,
+    format="%.2f",
+    value=service_charge if service_charge else 0.0,
+    placeholder="0.00",
+    key="tips_sc"
+)
+tips_credit_card = st.number_input("CC Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="tips_credit_card")
 
 # Ozet (Advance & Cash Wages DAHIL)
 deducted_items = (
-    cc1 + cc2 + cc3 +
-    amex1 + amex2 + amex3 +
-    voucher + deposit_minus + advance_cash_wages +
-    deliveroo + ubereats + petty_cash
+    (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
+    (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
+    (voucher or 0.0) + (deposit_minus or 0.0) + (advance_cash_wages or 0.0) +
+    (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
 )
-added_items = deposit_plus + tips_credit_card + tips_sc
-remaining_custom = calculated_taken_in - deducted_items + added_items
+added_items = (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
+remaining_custom = (calculated_taken_in or 0.0) - (deducted_items or 0.0) + (added_items or 0.0)
 
-float_val = float_input("Float (£)", key="float_val", placeholder="75.00", default=75.00)
-cash_tips = float_input("Cash Tips (£)", key="cash_tips")
+float_val = st.number_input("Float (£)", min_value=75.00, format="%.2f", value=75.00, placeholder="75.00", key="float_val")
+cash_tips = st.number_input("Cash Tips (£)", min_value=0.0, format="%.2f", value=None, placeholder="0.00", key="cash_tips")
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 
-cash_in_hand = float_input("Cash In Hand (£)", key="cash_in_hand")
+# Cash In Hand (ilk dokunusta 0.00 temizleme)
+if "cash_in_hand_first_edit" not in st.session_state:
+    st.session_state.cash_in_hand_first_edit = True
+
+cash_in_hand = st.number_input(
+    "Cash In Hand (£)",
+    min_value=0.0,
+    format="%.2f",
+    value=None if st.session_state.cash_in_hand_first_edit else (st.session_state.get("cash_in_hand") or 0.0),
+    placeholder="0.00",
+    key="cash_in_hand"
+)
+
+if st.session_state.cash_in_hand_first_edit and cash_in_hand != 0.0:
+    st.session_state.cash_in_hand_first_edit = False
 
 # Fark + Zarf toplami
-difference = cash_in_hand - remaining_custom
+difference = (cash_in_hand or 0.0) - (remaining_custom or 0.0)
 st.markdown(f"**Difference:** £{difference:.2f}")
 
-cash_in_envelope_total = cash_in_hand + cash_tips
+cash_in_envelope_total = (cash_in_hand or 0.0) + (cash_tips or 0.0)
 st.markdown(f"### 💰 Cash in Envelope Total: £{cash_in_envelope_total:.2f}")
-st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{tips_credit_card + tips_sc + cash_tips:.2f}")
+st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
 
 # Gorsel yukleme
 uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
@@ -161,21 +175,51 @@ if submitted:
 
     # Satir gonder (Extended sheet)
     row = [
-        date_str, z_number, gross_total, net_total, service_charge,
-        discount_total, complimentary_total, staff_food,
-        calculated_taken_in, cc1, cc2, cc3, amex1, amex2, amex3,
-        voucher, petty_cash, advance_cash_wages, petty_cash_note,
-        deposit_plus, deposit_minus, deposit_details,
-        deliveroo, ubereats, "",
-        tips_credit_card, cash_tips, difference, cash_in_hand,
-        tips_credit_card + tips_sc + cash_tips, float_val, manager
+        date_str or "",
+        z_number or "",
+        (gross_total if gross_total is not None else 0.0),
+        (net_total if net_total is not None else 0.0),
+        (service_charge if service_charge is not None else 0.0),
+        (discount_total if discount_total is not None else 0.0),
+        (complimentary_total if complimentary_total is not None else 0.0),
+        (staff_food if staff_food is not None else 0.0),
+        (calculated_taken_in if calculated_taken_in is not None else 0.0),
+        (cc1 if cc1 is not None else 0.0),
+        (cc2 if cc2 is not None else 0.0),
+        (cc3 if cc3 is not None else 0.0),
+        (amex1 if amex1 is not None else 0.0),
+        (amex2 if amex2 is not None else 0.0),
+        (amex3 if amex3 is not None else 0.0),
+        (voucher if voucher is not None else 0.0),
+        (petty_cash if petty_cash is not None else 0.0),
+        (advance_cash_wages if advance_cash_wages is not None else 0.0),
+        petty_cash_note or "",
+        (deposit_plus if deposit_plus is not None else 0.0),
+        (deposit_minus if deposit_minus is not None else 0.0),
+        deposit_details or "",
+        (deliveroo if deliveroo is not None else 0.0),
+        (ubereats if ubereats is not None else 0.0),
+        "",
+        (tips_credit_card if tips_credit_card is not None else 0.0),
+        (cash_tips if cash_tips is not None else 0.0),
+        (difference if difference is not None else 0.0),
+        (cash_in_hand if cash_in_hand is not None else 0.0),
+        (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),
+        (float_val if float_val is not None else 0.0),
+        manager or ""
     ] + images
-
     append_row_retry(banking_sheet, row)
 
-    # Ikinci sheet
+    # Ikinci sheet: ID ile ve retry'li
     second_sheet = open_ws_by_key(client, PRIMARY_SHEET_ID, "BANKING")
-    summary_row = [date_str, calculated_taken_in, service_charge, tips_credit_card, cash_tips, cash_in_hand]
+    summary_row = [
+        date_str or "",
+        (calculated_taken_in if calculated_taken_in is not None else 0.0),
+        (service_charge if service_charge is not None else 0.0),
+        (tips_credit_card if tips_credit_card is not None else 0.0),
+        (cash_tips if cash_tips is not None else 0.0),
+        (cash_in_hand if cash_in_hand is not None else 0.0)
+    ]
     append_row_retry(second_sheet, summary_row)
 
     st.session_state["form_submitted"] = True
