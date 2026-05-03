@@ -83,7 +83,7 @@ petty_cash = float_input("Petty Cash (£)", "petty_cash")
 deposit_plus = float_input("Deposit ( + ) (£)", "deposit_plus")
 
 # Service Charge Tips — ustteki service_charge'a bagli
-tips_sc_input = st.text_input("Service Charge Tips (£)", value=str(service_charge if service_charge else ""), key="tips_sc")
+tips_sc_input = st.text_input("Service Charge Tips (£)", value=str(service_charge), key="tips_sc")
 try:
     tips_sc = float(tips_sc_input) if tips_sc_input else 0.0
 except ValueError:
