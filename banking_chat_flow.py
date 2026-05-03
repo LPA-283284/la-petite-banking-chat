@@ -195,7 +195,7 @@ if submitted:
         ubereats,
         "",
         tips_credit_card,
-        cash_tips,
+        0.0,
         difference,
         cash_in_hand,
         (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),
