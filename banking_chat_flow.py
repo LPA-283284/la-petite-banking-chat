@@ -35,6 +35,9 @@ def append_row_retry(worksheet, row, tries=4, base_delay=0.6):
                 raise
             time.sleep(base_delay * (2 ** i))
 
+def sync_service_charge_to_tips():
+    st.session_state["tips_sc"] = st.session_state.get("service_charge", "")
+
 # Sayfa yapilandirmasi
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
 st.title("LPA - BANKING")
@@ -58,7 +61,19 @@ def float_input(label, key):
 z_number = st.text_input("Z Number")
 gross_total = float_input("Gross (£)", "gross_total")
 net_total = float_input("Net (£)", "net_total")
-service_charge = float_input("Service Charge (£)", "service_charge")
+
+service_charge_input = st.text_input(
+    "Service Charge (£)",
+    value="",
+    key="service_charge",
+    on_change=sync_service_charge_to_tips
+)
+
+try:
+    service_charge = float(service_charge_input) if service_charge_input else 0.0
+except ValueError:
+    service_charge = 0.0
+
 discount_total = float_input("Discount (£)", "discount_total")
 complimentary_total = float_input("Complimentary (£)", "complimentary_total")
 staff_food = float_input("Staff Food (£)", "staff_food")
@@ -83,10 +98,12 @@ petty_cash = float_input("Petty Cash (£)", "petty_cash")
 deposit_plus = float_input("Deposit ( + ) (£)", "deposit_plus")
 
 # Service Charge Tips — ustteki service_charge'a bagli
-if "tips_sc" not in st.session_state:
-    st.session_state["tips_sc"] = service_charge
 tips_sc_input = st.text_input("Service Charge Tips (£)", key="tips_sc")
-tips_sc = float(st.session_state["tips_sc"]) if st.session_state["tips_sc"] else 0.0
+
+try:
+    tips_sc = float(tips_sc_input) if tips_sc_input else 0.0
+except ValueError:
+    tips_sc = 0.0
 
 tips_credit_card = float_input("CC Tips (£)", "tips_credit_card")
 
