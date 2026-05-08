@@ -128,7 +128,7 @@ st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 cash_in_hand = float_input("Cash In Hand (£)", "cash_in_hand")
 
 # Fark + Zarf toplami
-difference = (cash_in_hand or 0.0) - (remaining_custom or 0.0)
+difference = (cash_in_hand or 0.0) - abs(remaining_custom or 0.0)
 st.markdown(f"**Difference:** £{difference:.2f}")
 
 cash_in_envelope_total = (cash_in_hand or 0.0) + (cash_tips or 0.0)
