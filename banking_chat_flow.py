@@ -117,8 +117,11 @@ deducted_items = (
 added_items = (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
 remaining_custom = (calculated_taken_in or 0.0) - (deducted_items or 0.0) + (added_items or 0.0)
 
-float_val = float_input("Float (£)", "float_val")
-if float_val == 0.0:
+float_default = st.text_input("Float (£)", value="75", key="float_val")
+
+try:
+    float_val = float(float_default) if float_default else 75.0
+except ValueError:
     float_val = 75.0
 cash_tips = float_input("Cash Tips (£)", "cash_tips")
 
