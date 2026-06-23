@@ -35,6 +35,19 @@ def append_row_retry(worksheet, row, tries=4, base_delay=0.6):
                 raise
             time.sleep(base_delay * (2 ** i))
 
+def date_exists_in_sheet(worksheet, date_str, tries=3, base_delay=0.6):
+    """Verilen tarih (A sutunu) bu sayfada zaten var mi? Cift kayit engeli icin."""
+    for i in range(tries):
+        try:
+            col = worksheet.col_values(1)  # A sutunu = tarihler
+            return date_str in col
+        except APIError:
+            if i == tries - 1:
+                # Kontrol edilemezse engelleme; False don (akisi durdurmamak icin)
+                return False
+            time.sleep(base_delay * (2 ** i))
+    return False
+
 # Sayfa yapilandirmasi
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
 
@@ -273,104 +286,129 @@ if submitted:
         st.error("❌ Lutfen 'Z Number' ve 'Manager' alanlarini doldurun.")
         st.stop()
 
+    # === CIFT GONDERIM KORUMASI ===
+    # Bu kaydin benzersiz bir imzasini cikar. Ayni imza daha once gonderildiyse tekrar yazma.
+    submission_signature = f"{date_str}|{z_number}|{calculated_taken_in:.2f}|{cash_in_hand:.2f}"
+    if st.session_state.get("last_submission") == submission_signature:
+        st.warning("⚠️ Bu kayit zaten gonderilmis gorunuyor. Tekrar gondermek istiyorsan alanlari degistir.")
+        st.stop()
+
     try:
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(
-            json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
-            scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-        )
-        client = gspread.authorize(creds)
-
-        # Extended sheet (ID ile) + worksheet retry
-        banking_sheet = open_ws_by_key(client, EXTENDED_SHEET_ID, "BANKING")
-
-        # Drive upload (hata yonetimli)
-        photo_links = []
-        if uploaded_files:
-            creds_drive = Credentials.from_service_account_info(
+        with st.spinner("Gonderiliyor, lutfen bekleyin..."):
+            creds = ServiceAccountCredentials.from_json_keyfile_dict(
                 json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
-                scopes=["https://www.googleapis.com/auth/drive"]
+                scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
             )
-            drive_service = build('drive', 'v3', credentials=creds_drive)
+            client = gspread.authorize(creds)
 
-            for file in uploaded_files:
-                try:
-                    file_bytes = io.BytesIO(file.getbuffer())
-                    media = MediaIoBaseUpload(file_bytes, mimetype=(file.type or "application/octet-stream"))
+            # Once iki worksheet'i de ac (biri acilamiyorsa hic yazma, yarim kayit olmasin)
+            banking_sheet = open_ws_by_key(client, EXTENDED_SHEET_ID, "BANKING")
+            second_sheet = open_ws_by_key(client, PRIMARY_SHEET_ID, "BANKING")
 
-                    uploaded = drive_service.files().create(
-                        body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"]},
-                        media_body=media,
-                        fields="id"
-                    ).execute()
+            # Ayni tarih icin tekrar kayit engeli (gunde 1 kayit yeterli).
+            # Bu, sayfa yenilense bile calisir cunku dogrudan sheet'e bakar.
+            if date_exists_in_sheet(banking_sheet, date_str):
+                st.error(f"⚠️ {date_str} tarihi icin zaten bir kayit var. Cift kayit engellendi.")
+                st.stop()
 
-                    drive_service.permissions().create(
-                        fileId=uploaded["id"],
-                        body={"type": "anyone", "role": "reader"}
-                    ).execute()
+            # Drive upload (hata yonetimli)
+            photo_links = []
+            if uploaded_files:
+                creds_drive = Credentials.from_service_account_info(
+                    json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
+                    scopes=["https://www.googleapis.com/auth/drive"]
+                )
+                drive_service = build('drive', 'v3', credentials=creds_drive)
 
-                    # Daha guvenilir link formati
-                    photo_links.append(f"https://drive.google.com/file/d/{uploaded['id']}/view")
-                except Exception as e:
-                    st.warning(f"⚠️ '{file.name}' yuklenemedi: {e}")
+                for file in uploaded_files:
+                    try:
+                        file_bytes = io.BytesIO(file.getbuffer())
+                        media = MediaIoBaseUpload(file_bytes, mimetype=(file.type or "application/octet-stream"))
 
-        images = (photo_links + [""] * 6)[:6]
+                        uploaded = drive_service.files().create(
+                            body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"]},
+                            media_body=media,
+                            fields="id"
+                        ).execute()
 
-        # Satir gonder (Extended sheet)
-        row = [
-            date_str or "",
-            z_number or "",
-            gross_total,
-            net_total,
-            service_charge,
-            discount_total,
-            complimentary_total,
-            staff_food,
-            calculated_taken_in,
-            cc1, cc2, cc3,
-            amex1, amex2, amex3,
-            voucher,
-            petty_cash,
-            advance_cash_wages,
-            petty_cash_note or "",
-            deposit_plus,
-            deposit_minus,
-            deposit_details or "",
-            deliveroo,
-            ubereats,
-            "",
-            tips_credit_card,
-            0.0,
-            difference,
-            cash_in_hand,
-            tips_credit_card + tips_sc + cash_tips,
-            float_val,
-            manager or ""
-        ] + images
-        append_row_retry(banking_sheet, row)
+                        drive_service.permissions().create(
+                            fileId=uploaded["id"],
+                            body={"type": "anyone", "role": "reader"}
+                        ).execute()
 
-        # Ikinci sheet: ID ile ve retry'li
-        second_sheet = open_ws_by_key(client, PRIMARY_SHEET_ID, "BANKING")
-        summary_row = [
-            date_str or "",
-            calculated_taken_in,
-            service_charge,
-            tips_credit_card,
-            cash_tips,
-            cash_in_hand
-        ]
-        append_row_retry(second_sheet, summary_row)
+                        photo_links.append(f"https://drive.google.com/file/d/{uploaded['id']}/view")
+                    except Exception as e:
+                        st.warning(f"⚠️ '{file.name}' yuklenemedi: {e}")
 
-        # Veri gonderimini logla (kim, ne zaman, hangi gun + Z number)
-        write_log(
-            current_user,
-            "SUBMIT",
-            f"Date={date_str}, Z={z_number}, TakenIn={calculated_taken_in:.2f}"
-        )
+            images = (photo_links + [""] * 6)[:6]
+
+            # Satir gonder (Extended sheet)
+            row = [
+                date_str or "",
+                z_number or "",
+                gross_total,
+                net_total,
+                service_charge,
+                discount_total,
+                complimentary_total,
+                staff_food,
+                calculated_taken_in,
+                cc1, cc2, cc3,
+                amex1, amex2, amex3,
+                voucher,
+                petty_cash,
+                advance_cash_wages,
+                petty_cash_note or "",
+                deposit_plus,
+                deposit_minus,
+                deposit_details or "",
+                deliveroo,
+                ubereats,
+                "",
+                tips_credit_card,
+                0.0,
+                difference,
+                cash_in_hand,
+                tips_credit_card + tips_sc + cash_tips,
+                float_val,
+                manager or ""
+            ] + images
+            append_row_retry(banking_sheet, row)
+
+            # Ikinci sheet (ozet)
+            summary_row = [
+                date_str or "",
+                calculated_taken_in,
+                service_charge,
+                tips_credit_card,
+                cash_tips,
+                cash_in_hand
+            ]
+            try:
+                append_row_retry(second_sheet, summary_row)
+            except Exception as e:
+                # Ana satir yazildi ama ozet yazilamadi -> yarim kayit uyarisi
+                st.warning(
+                    "⚠️ Ana kayit yazildi ancak ozet sayfaya yazilamadi. "
+                    f"Lutfen ozet sayfayi elle kontrol edin. Detay: {e}"
+                )
+                write_log(current_user, "SUMMARY_FAIL", f"Date={date_str}, Z={z_number}")
+
+            # Basarili: imzayi kaydet ki ayni kayit tekrar gonderilmesin
+            st.session_state["last_submission"] = submission_signature
+
+            # Veri gonderimini logla (kim, ne zaman, hangi gun + Z number)
+            write_log(
+                current_user,
+                "SUBMIT",
+                f"Date={date_str}, Z={z_number}, TakenIn={calculated_taken_in:.2f}"
+            )
 
         st.session_state["form_submitted"] = True
 
     except Exception as e:
-        st.error(f"❌ Gonderim sirasinda hata olustu: {e}")
+        st.error(f"❌ Gonderim sirasinda hata olustu, kayit tamamlanmadi: {e}")
+        write_log(current_user, "SUBMIT_FAIL", f"Date={date_str}, Z={z_number}, Hata={e}")
 
 # Basari mesaji
 if st.session_state.get("form_submitted"):
