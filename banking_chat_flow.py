@@ -79,10 +79,13 @@ st.markdown(
     /* Submit butonu */
     .stButton button, .stFormSubmitButton button {
         background-color: var(--bordo) !important;
-        color: var(--krem) !important;
+        color: #FFFFFF !important;
         border: none !important;
         border-radius: 8px !important;
         font-weight: 700 !important;
+    }
+    .stButton button *, .stFormSubmitButton button * {
+        color: #FFFFFF !important;
     }
     .stButton button:hover, .stFormSubmitButton button:hover {
         background-color: #5e1620 !important;
@@ -96,33 +99,67 @@ st.markdown(
 
 st.title("LPA - BANKING")
 
-# === SIFRE KORUMASI (PASSWORD GATE) ===
-# Sifre kodun icinde DEGIL, st.secrets icinde saklanir.
-# Streamlit Cloud -> Settings -> Secrets kismina su satiri ekle:
-#   APP_PASSWORD = "buraya-guclu-bir-sifre"
-def check_password():
-    """Dogru sifre girilene kadar uygulamayi kilitli tutar."""
-    if st.session_state.get("password_ok"):
+# === KULLANICI GIRISI + TAKIP (LOGIN & AUDIT) ===
+# Kullanicilar kodun icinde DEGIL, st.secrets icinde saklanir.
+# Streamlit Cloud -> Settings -> Secrets kismina su sekilde ekle:
+#
+#   [users]
+#   ahmet = "ahmet-sifresi"
+#   mehmet = "mehmet-sifresi"
+#
+# Log icin EXTENDED_SHEET_ID'deki spreadsheet'te "LOG" adli bir worksheet olustur.
+# Sutunlar onerisi: Timestamp | User | Action | Detail
+
+LOG_WORKSHEET_NAME = "LOG"
+
+def _get_creds():
+    return ServiceAccountCredentials.from_json_keyfile_dict(
+        json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
+        scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+    )
+
+def write_log(user, action, detail=""):
+    """Giris ve veri gonderimlerini LOG sayfasina yazar. Hata olsa bile uygulamayi durdurmaz."""
+    try:
+        client = gspread.authorize(_get_creds())
+        log_ws = open_ws_by_key(client, EXTENDED_SHEET_ID, LOG_WORKSHEET_NAME)
+        ts = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        append_row_retry(log_ws, [ts, user or "", action or "", detail or ""])
+    except Exception:
+        # Log yazilamazsa kullaniciyi engelleme; sessizce gec.
+        pass
+
+def check_login():
+    """Dogru kullanici adi + sifre girilene kadar uygulamayi kilitli tutar."""
+    if st.session_state.get("auth_ok"):
         return True
 
-    st.markdown("#### 🔒 This area is protected. Please enter the password.")
-    pwd = st.text_input("Password", type="password", key="password_input")
+    st.markdown("#### 🔒 This area is protected. Please log in.")
+    username = st.text_input("Username", key="login_user")
+    pwd = st.text_input("Password", type="password", key="login_pwd")
 
     if st.button("Enter"):
-        correct = st.secrets.get("APP_PASSWORD", None)
-        if correct is None:
-            st.error("⚠️ APP_PASSWORD ayarlanmamis. Lutfen Streamlit Secrets'a ekleyin.")
-        elif pwd == correct:
-            st.session_state["password_ok"] = True
-            # Girilen sifreyi hafizada tutma
-            st.session_state.pop("password_input", None)
+        users = st.secrets.get("users", None)
+        if users is None:
+            st.error("⚠️ Kullanici listesi (users) Secrets'a eklenmemis.")
+        elif username in users and pwd == users[username]:
+            st.session_state["auth_ok"] = True
+            st.session_state["current_user"] = username
+            st.session_state.pop("login_pwd", None)
+            write_log(username, "LOGIN", "Basarili giris")
             st.rerun()
         else:
-            st.error("❌ Incorrect password.")
+            st.error("❌ Incorrect username or password.")
+            write_log(username or "?", "LOGIN_FAIL", "Hatali giris denemesi")
     return False
 
-if not check_password():
+if not check_login():
     st.stop()
+
+# Giris yapan kullanici (log ve gosterim icin)
+current_user = st.session_state.get("current_user", "?")
+st.caption(f"👤 Logged in as: {current_user}")
+
 
 
 st.markdown("You can enter detailed banking information by filling in the fields below.")
@@ -320,6 +357,13 @@ if submitted:
             cash_in_hand
         ]
         append_row_retry(second_sheet, summary_row)
+
+        # Veri gonderimini logla (kim, ne zaman, hangi gun + Z number)
+        write_log(
+            current_user,
+            "SUBMIT",
+            f"Date={date_str}, Z={z_number}, TakenIn={calculated_taken_in:.2f}"
+        )
 
         st.session_state["form_submitted"] = True
 
