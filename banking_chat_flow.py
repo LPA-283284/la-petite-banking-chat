@@ -35,12 +35,95 @@ def append_row_retry(worksheet, row, tries=4, base_delay=0.6):
                 raise
             time.sleep(base_delay * (2 ** i))
 
-def sync_service_charge_to_tips():
-    st.session_state["tips_sc"] = st.session_state.get("service_charge", "")
-
 # Sayfa yapilandirmasi
 st.set_page_config(page_title="LPA Banking", page_icon="📊")
+
+# === KREM ARKAPLAN + BORDO YAZI TEMASI ===
+st.markdown(
+    """
+    <style>
+    :root { --krem:#F5EBDC; --bordo:#7B1E2B; }
+    .stApp { background-color: var(--krem); }
+    /* Tum yazilar bordo */
+    .stApp, .stApp p, .stApp label, .stApp span, .stApp div,
+    h1, h2, h3, h4, h5, h6, .stMarkdown { color: var(--bordo) !important; }
+    /* Baslik */
+    h1 { font-weight: 800; letter-spacing: 1px; }
+    /* Input alanlari */
+    .stTextInput input, .stTextArea textarea, .stDateInput input {
+        background-color: #FFFDF8 !important;
+        color: var(--bordo) !important;
+        border: 1px solid var(--bordo) !important;
+        border-radius: 8px !important;
+    }
+    /* Salt-okunur (disabled) alan da bordo gozuksun, sadece hafif soluk arkaplan */
+    .stTextInput input:disabled {
+        background-color: #EFE6D6 !important;
+        color: var(--bordo) !important;
+        -webkit-text-fill-color: var(--bordo) !important;
+        opacity: 1 !important;
+    }
+    /* number_input alanlari */
+    .stNumberInput input {
+        background-color: #FFFDF8 !important;
+        color: var(--bordo) !important;
+        border: 1px solid var(--bordo) !important;
+        border-radius: 8px !important;
+    }
+    /* number_input +/- butonlari */
+    .stNumberInput button {
+        background-color: #FFFDF8 !important;
+        color: var(--bordo) !important;
+        border: 1px solid var(--bordo) !important;
+    }
+    /* Submit butonu */
+    .stButton button, .stFormSubmitButton button {
+        background-color: var(--bordo) !important;
+        color: var(--krem) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 700 !important;
+    }
+    .stButton button:hover, .stFormSubmitButton button:hover {
+        background-color: #5e1620 !important;
+    }
+    /* File uploader */
+    .stFileUploader { border: 1px dashed var(--bordo); border-radius: 8px; padding: 6px; }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title("LPA - BANKING")
+
+# === SIFRE KORUMASI (PASSWORD GATE) ===
+# Sifre kodun icinde DEGIL, st.secrets icinde saklanir.
+# Streamlit Cloud -> Settings -> Secrets kismina su satiri ekle:
+#   APP_PASSWORD = "buraya-guclu-bir-sifre"
+def check_password():
+    """Dogru sifre girilene kadar uygulamayi kilitli tutar."""
+    if st.session_state.get("password_ok"):
+        return True
+
+    st.markdown("#### 🔒 This area is protected. Please enter the password.")
+    pwd = st.text_input("Password", type="password", key="password_input")
+
+    if st.button("Enter"):
+        correct = st.secrets.get("APP_PASSWORD", None)
+        if correct is None:
+            st.error("⚠️ APP_PASSWORD ayarlanmamis. Lutfen Streamlit Secrets'a ekleyin.")
+        elif pwd == correct:
+            st.session_state["password_ok"] = True
+            # Girilen sifreyi hafizada tutma
+            st.session_state.pop("password_input", None)
+            st.rerun()
+        else:
+            st.error("❌ Incorrect password.")
+    return False
+
+if not check_password():
+    st.stop()
+
 
 st.markdown("You can enter detailed banking information by filling in the fields below.")
 today = datetime.date.today()
@@ -49,37 +132,37 @@ date = st.date_input("Date", today)
 # Tarihi gun/ay/yil formatina cevir
 date_str = date.strftime("%d/%m/%Y")
 
-# === Yardımcı fonksiyon (text → float) ===
-def float_input(label, key):
-    val = st.text_input(label, value="", key=key)
-    try:
-        return float(val) if val else 0.0
-    except ValueError:
-        return 0.0
+# === Yardımcı fonksiyon: sayisal giris ===
+# Alanlar 0.00 ile baslar; kullanici tiklayinca rahatca kendi rakamini yazar.
+# number_input kullaniliyor: virgul/nokta derdi yok, 0 otomatik temizlenir, ok tuslari calisir.
+def float_input(label, key, default=0.0):
+    return st.number_input(
+        label,
+        value=float(default),
+        step=1.0,
+        format="%.2f",
+        key=key
+    )
 
 # Sayisal girisler
 z_number = st.text_input("Z Number")
 gross_total = float_input("Gross (£)", "gross_total")
 net_total = float_input("Net (£)", "net_total")
 
-service_charge_input = st.text_input(
+service_charge = st.number_input(
     "Service Charge (£)",
-    value="",
-    key="service_charge",
-    on_change=sync_service_charge_to_tips
+    value=0.0,
+    step=1.0,
+    format="%.2f",
+    key="service_charge"
 )
-
-try:
-    service_charge = float(service_charge_input) if service_charge_input else 0.0
-except ValueError:
-    service_charge = 0.0
 
 discount_total = float_input("Discount (£)", "discount_total")
 complimentary_total = float_input("Complimentary (£)", "complimentary_total")
 staff_food = float_input("Staff Food (£)", "staff_food")
 
 # Hesaplama
-calculated_taken_in = (gross_total or 0.0) - ((discount_total or 0.0) + (complimentary_total or 0.0) + (staff_food or 0.0))
+calculated_taken_in = gross_total - (discount_total + complimentary_total + staff_food)
 st.markdown(f"### 💸 Taken In (Calculated): £{calculated_taken_in:.2f}")
 
 # Diger odemeler
@@ -97,32 +180,29 @@ ubereats = float_input("Uber Eats (£)", "ubereats")
 petty_cash = float_input("Petty Cash (£)", "petty_cash")
 deposit_plus = float_input("Deposit ( + ) (£)", "deposit_plus")
 
-# Service Charge Tips — ustteki service_charge'a bagli
-tips_sc_input = st.text_input("Service Charge Tips (£)", key="tips_sc")
-
-try:
-    tips_sc = float(tips_sc_input) if tips_sc_input else 0.0
-except ValueError:
-    tips_sc = 0.0
+# Service Charge Tips — SADECE GOSTERIM. Deger tamamen ustteki Service Charge'dan gelir.
+# Salt-okunur (disabled): kullanici buradan degistiremez, tek kaynak ust alan.
+tips_sc = service_charge
+st.text_input(
+    "Service Charge Tips (£)",
+    value=f"{service_charge:.2f}",
+    key="tips_sc_display",
+    disabled=True
+)
 
 tips_credit_card = float_input("CC Tips (£)", "tips_credit_card")
 
 # Ozet (Advance & Cash Wages DAHIL)
 deducted_items = (
-    (cc1 or 0.0) + (cc2 or 0.0) + (cc3 or 0.0) +
-    (amex1 or 0.0) + (amex2 or 0.0) + (amex3 or 0.0) +
-    (voucher or 0.0) + (deposit_minus or 0.0) + (advance_cash_wages or 0.0) +
-    (deliveroo or 0.0) + (ubereats or 0.0) + (petty_cash or 0.0)
+    cc1 + cc2 + cc3 + amex1 + amex2 + amex3 +
+    voucher + deposit_minus + advance_cash_wages +
+    deliveroo + ubereats + petty_cash
 )
-added_items = (deposit_plus or 0.0) + (tips_credit_card or 0.0) + (tips_sc or 0.0)
-remaining_custom = (calculated_taken_in or 0.0) - (deducted_items or 0.0) + (added_items or 0.0)
+added_items = deposit_plus + tips_credit_card + tips_sc
+remaining_custom = calculated_taken_in - deducted_items + added_items
 
-float_default = st.text_input("Float (£)", value="75.00", key="float_val")
-
-try:
-    float_val = float(float_default) if float_default else 75.00
-except ValueError:
-    float_val = 75.00
+# Float otomatik 75.00 gelir, gerekirse duzenlenebilir
+float_val = st.number_input("Float (£)", value=75.00, step=1.0, format="%.2f", key="float_val")
 cash_tips = float_input("Cash Tips (£)", "cash_tips")
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
@@ -130,13 +210,13 @@ st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
 # Cash In Hand
 cash_in_hand = float_input("Cash In Hand (£)", "cash_in_hand")
 
-# Fark + Zarf toplami
-difference = (cash_in_hand or 0.0) - abs(remaining_custom or 0.0)
+# Fark + Zarf toplami  (abs kaldirildi - dogru isaretli fark)
+difference = cash_in_hand - remaining_custom
 st.markdown(f"**Difference:** £{difference:.2f}")
 
-cash_in_envelope_total = (cash_in_hand or 0.0) + (cash_tips or 0.0)
+cash_in_envelope_total = cash_in_hand + cash_tips
 st.markdown(f"### 💰 Cash in Envelope Total: £{cash_in_envelope_total:.2f}")
-st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{(tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0):.2f}")
+st.markdown(f"##### ➕ Cash Tips Breakdown Total (CC + SC + Cash): £{tips_credit_card + tips_sc + cash_tips:.2f}")
 
 # Gorsel yukleme
 uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg", "jpeg", "png", "pdf"], accept_multiple_files=True)
@@ -149,93 +229,102 @@ with st.form("banking_form"):
     submitted = st.form_submit_button("Submit")
 
 if submitted:
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(
-        json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
-        scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-    )
-    client = gspread.authorize(creds)
+    # Basit zorunlu alan kontrolu
+    if not z_number.strip() or not manager.strip():
+        st.error("❌ Lutfen 'Z Number' ve 'Manager' alanlarini doldurun.")
+        st.stop()
 
-    # Extended sheet (ID ile) + worksheet retry
-    banking_sheet = open_ws_by_key(client, EXTENDED_SHEET_ID, "BANKING")
-
-    # Drive upload
-    photo_links = []
-    if uploaded_files:
-        creds_drive = Credentials.from_service_account_info(
+    try:
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(
             json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
-            scopes=["https://www.googleapis.com/auth/drive"]
+            scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
         )
-        drive_service = build('drive', 'v3', credentials=creds_drive)
+        client = gspread.authorize(creds)
 
-        for file in uploaded_files:
-            file_bytes = io.BytesIO(file.getbuffer())
-            media = MediaIoBaseUpload(file_bytes, mimetype=(file.type or "application/octet-stream"))
+        # Extended sheet (ID ile) + worksheet retry
+        banking_sheet = open_ws_by_key(client, EXTENDED_SHEET_ID, "BANKING")
 
-            uploaded = drive_service.files().create(
-                body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"]},
-                media_body=media,
-                fields="id"
-            ).execute()
+        # Drive upload (hata yonetimli)
+        photo_links = []
+        if uploaded_files:
+            creds_drive = Credentials.from_service_account_info(
+                json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
+                scopes=["https://www.googleapis.com/auth/drive"]
+            )
+            drive_service = build('drive', 'v3', credentials=creds_drive)
 
-            drive_service.permissions().create(
-                fileId=uploaded["id"],
-                body={"type": "anyone", "role": "reader"}
-            ).execute()
+            for file in uploaded_files:
+                try:
+                    file_bytes = io.BytesIO(file.getbuffer())
+                    media = MediaIoBaseUpload(file_bytes, mimetype=(file.type or "application/octet-stream"))
 
-            photo_links.append(f"https://drive.google.com/uc?id={uploaded['id']}")
+                    uploaded = drive_service.files().create(
+                        body={"name": file.name, "parents": ["18HTYODsW_iDd9EBj3-bquyyGaWxflUNx"]},
+                        media_body=media,
+                        fields="id"
+                    ).execute()
 
-    images = (photo_links + [""] * 6)[:6]
+                    drive_service.permissions().create(
+                        fileId=uploaded["id"],
+                        body={"type": "anyone", "role": "reader"}
+                    ).execute()
 
-    # Satir gonder (Extended sheet)
-    row = [
-        date_str or "",
-        z_number or "",
-        gross_total,
-        net_total,
-        service_charge,
-        discount_total,
-        complimentary_total,
-        staff_food,
-        calculated_taken_in,
-        cc1,
-        cc2,
-        cc3,
-        amex1,
-        amex2,
-        amex3,
-        voucher,
-        petty_cash,
-        advance_cash_wages,
-        petty_cash_note or "",
-        deposit_plus,
-        deposit_minus,
-        deposit_details or "",
-        deliveroo,
-        ubereats,
-        "",
-        tips_credit_card,
-        0.0,
-        difference,
-        cash_in_hand,
-        (tips_credit_card or 0.0) + (tips_sc or 0.0) + (cash_tips or 0.0),
-        float_val,
-        manager or ""
-    ] + images
-    append_row_retry(banking_sheet, row)
+                    # Daha guvenilir link formati
+                    photo_links.append(f"https://drive.google.com/file/d/{uploaded['id']}/view")
+                except Exception as e:
+                    st.warning(f"⚠️ '{file.name}' yuklenemedi: {e}")
 
-    # Ikinci sheet: ID ile ve retry'li
-    second_sheet = open_ws_by_key(client, PRIMARY_SHEET_ID, "BANKING")
-    summary_row = [
-        date_str or "",
-        calculated_taken_in,
-        service_charge,
-        tips_credit_card,
-        cash_tips,
-        cash_in_hand
-    ]
-    append_row_retry(second_sheet, summary_row)
+        images = (photo_links + [""] * 6)[:6]
 
-    st.session_state["form_submitted"] = True
+        # Satir gonder (Extended sheet)
+        row = [
+            date_str or "",
+            z_number or "",
+            gross_total,
+            net_total,
+            service_charge,
+            discount_total,
+            complimentary_total,
+            staff_food,
+            calculated_taken_in,
+            cc1, cc2, cc3,
+            amex1, amex2, amex3,
+            voucher,
+            petty_cash,
+            advance_cash_wages,
+            petty_cash_note or "",
+            deposit_plus,
+            deposit_minus,
+            deposit_details or "",
+            deliveroo,
+            ubereats,
+            "",
+            tips_credit_card,
+            0.0,
+            difference,
+            cash_in_hand,
+            tips_credit_card + tips_sc + cash_tips,
+            float_val,
+            manager or ""
+        ] + images
+        append_row_retry(banking_sheet, row)
+
+        # Ikinci sheet: ID ile ve retry'li
+        second_sheet = open_ws_by_key(client, PRIMARY_SHEET_ID, "BANKING")
+        summary_row = [
+            date_str or "",
+            calculated_taken_in,
+            service_charge,
+            tips_credit_card,
+            cash_tips,
+            cash_in_hand
+        ]
+        append_row_retry(second_sheet, summary_row)
+
+        st.session_state["form_submitted"] = True
+
+    except Exception as e:
+        st.error(f"❌ Gonderim sirasinda hata olustu: {e}")
 
 # Basari mesaji
 if st.session_state.get("form_submitted"):
