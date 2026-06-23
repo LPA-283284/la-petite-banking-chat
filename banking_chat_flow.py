@@ -97,30 +97,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# === Tiklayinca/odaklaninca metin alanindaki icerigi otomatik sec ===
-# Boylece "0.00" yazan alana tiklayip yazmaya baslayinca otomatik silinir.
-st.markdown(
-    """
-    <script>
-    (function() {
-        const root = window.parent.document;
-        function selectAll(e) {
-            const t = e.target;
-            if (t && t.tagName === "INPUT" && (t.type === "text" || t.type === "number")) {
-                if (!t.disabled && !t.readOnly) {
-                    setTimeout(function(){ try { t.select(); } catch(err) {} }, 0);
-                }
-            }
-        }
-        // focus ve mouseup olaylarinda metni sec
-        root.addEventListener("focusin", selectAll, true);
-        root.addEventListener("click", selectAll, true);
-    })();
-    </script>
-    """,
-    unsafe_allow_html=True
-)
-
 st.title("LPA - BANKING")
 
 # === KULLANICI GIRISI + TAKIP (LOGIN & AUDIT) ===
@@ -194,9 +170,9 @@ date = st.date_input("Date", today)
 date_str = date.strftime("%d/%m/%Y")
 
 # === Yardımcı fonksiyon: sayisal giris ===
-# Alanlar "0.00" ile baslar. Tiklayinca icerik otomatik secilir (asagidaki JS ile),
-# boylece yazmaya baslayinca 0.00 silinir. Virgul de nokta olarak kabul edilir.
-def float_input(label, key, default="0.00"):
+# Alanlar BOS baslar (sifir gosterilmez). Bos birakilan alan hesaplamada 0 sayilir.
+# Tiklayinca alan zaten bos oldugu icin direkt rakam yazilir. Virgul de nokta kabul edilir.
+def float_input(label, key, default=""):
     val = st.text_input(label, value=default, key=key)
     if not val:
         return 0.0
