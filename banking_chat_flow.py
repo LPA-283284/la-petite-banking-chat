@@ -97,6 +97,30 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# === Tiklayinca/odaklaninca metin alanindaki icerigi otomatik sec ===
+# Boylece "0.00" yazan alana tiklayip yazmaya baslayinca otomatik silinir.
+st.markdown(
+    """
+    <script>
+    (function() {
+        const root = window.parent.document;
+        function selectAll(e) {
+            const t = e.target;
+            if (t && t.tagName === "INPUT" && (t.type === "text" || t.type === "number")) {
+                if (!t.disabled && !t.readOnly) {
+                    setTimeout(function(){ try { t.select(); } catch(err) {} }, 0);
+                }
+            }
+        }
+        // focus ve mouseup olaylarinda metni sec
+        root.addEventListener("focusin", selectAll, true);
+        root.addEventListener("click", selectAll, true);
+    })();
+    </script>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title("LPA - BANKING")
 
 # === KULLANICI GIRISI + TAKIP (LOGIN & AUDIT) ===
@@ -170,29 +194,24 @@ date = st.date_input("Date", today)
 date_str = date.strftime("%d/%m/%Y")
 
 # === Yardımcı fonksiyon: sayisal giris ===
-# Alanlar 0.00 ile baslar; kullanici tiklayinca rahatca kendi rakamini yazar.
-# number_input kullaniliyor: virgul/nokta derdi yok, 0 otomatik temizlenir, ok tuslari calisir.
-def float_input(label, key, default=0.0):
-    return st.number_input(
-        label,
-        value=float(default),
-        step=1.0,
-        format="%.2f",
-        key=key
-    )
+# Alanlar "0.00" ile baslar. Tiklayinca icerik otomatik secilir (asagidaki JS ile),
+# boylece yazmaya baslayinca 0.00 silinir. Virgul de nokta olarak kabul edilir.
+def float_input(label, key, default="0.00"):
+    val = st.text_input(label, value=default, key=key)
+    if not val:
+        return 0.0
+    try:
+        return float(val.replace(",", ".").strip())
+    except ValueError:
+        st.warning(f"⚠️ '{label}' alanina gecersiz sayi girildi, 0.0 kullanildi.")
+        return 0.0
 
 # Sayisal girisler
 z_number = st.text_input("Z Number")
 gross_total = float_input("Gross (£)", "gross_total")
 net_total = float_input("Net (£)", "net_total")
 
-service_charge = st.number_input(
-    "Service Charge (£)",
-    value=0.0,
-    step=1.0,
-    format="%.2f",
-    key="service_charge"
-)
+service_charge = float_input("Service Charge (£)", "service_charge")
 
 discount_total = float_input("Discount (£)", "discount_total")
 complimentary_total = float_input("Complimentary (£)", "complimentary_total")
@@ -227,7 +246,14 @@ st.text_input(
     disabled=True
 )
 
-tips_credit_card = float_input("CC Tips (£)", "tips_credit_card")
+# CC Tips — ETKISIZ. Salt-okunur, hep 0.00. Hesaplamalara 0 olarak girer.
+tips_credit_card = 0.0
+st.text_input(
+    "CC Tips (£)",
+    value="0.00",
+    key="tips_credit_card_display",
+    disabled=True
+)
 
 # Ozet (Advance & Cash Wages DAHIL)
 deducted_items = (
@@ -239,7 +265,7 @@ added_items = deposit_plus + tips_credit_card + tips_sc
 remaining_custom = calculated_taken_in - deducted_items + added_items
 
 # Float otomatik 75.00 gelir, gerekirse duzenlenebilir
-float_val = st.number_input("Float (£)", value=75.00, step=1.0, format="%.2f", key="float_val")
+float_val = float_input("Float (£)", "float_val", default="75.00")
 cash_tips = float_input("Cash Tips (£)", "cash_tips")
 
 st.markdown(f"### 🧮 Till Balance: £{remaining_custom:.2f}")
