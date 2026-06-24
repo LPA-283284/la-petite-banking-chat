@@ -26,14 +26,39 @@ def open_ws_by_key(client, key, worksheet_name=None, tries=4, base_delay=0.6):
             time.sleep(base_delay * (2 ** i))
 
 def append_row_retry(worksheet, row, tries=4, base_delay=0.6):
+    """
+    Satiri ekler. ONEMLI: append_row idempotent DEGILDIR; kor retry ayni satiri
+    birden fazla kez yazabilir (yazma basarili olur ama yanit gecikir -> APIError).
+    Bu yuzden her denemeden once satir sayisini olcuyoruz; hata alirsak once
+    satirin gercekten eklenip eklenmedigini kontrol ediyoruz, eklendiyse duruyoruz.
+    """
     for i in range(tries):
         try:
-            worksheet.append_row(row, value_input_option="USER_ENTERED")
-            return
+            before = len(worksheet.get_all_values())
         except APIError:
+            before = None
+
+        try:
+            worksheet.append_row(row, value_input_option="USER_ENTERED")
+            return  # basarili
+        except APIError:
+            # Yazma sirasinda hata: satir gercekten eklendi mi kontrol et
+            time.sleep(base_delay * (2 ** i))
+            try:
+                after_vals = worksheet.get_all_values()
+                if before is not None and len(after_vals) > before:
+                    # Satir aslinda eklenmis -> tekrar yazma
+                    return
+                # Son satir bizim satirimizla eslesiyor mu? (ek guvenlik)
+                if after_vals:
+                    last = after_vals[-1]
+                    row_as_str = [str(x) for x in row]
+                    if last[:len(row_as_str)] == row_as_str:
+                        return
+            except APIError:
+                pass
             if i == tries - 1:
                 raise
-            time.sleep(base_delay * (2 ** i))
 
 def date_exists_in_sheet(worksheet, date_str, tries=3, base_delay=0.6):
     """Verilen tarih (A sutunu) bu sayfada zaten var mi? Cift kayit engeli icin."""
@@ -154,16 +179,16 @@ def check_login():
     if st.button("Enter"):
         users = st.secrets.get("users", None)
         if users is None:
-            st.error("⚠️ Kullanici listesi (users) Secrets'a eklenmemis.")
+            st.error("⚠️ User list ([users]) has not been added to Secrets.")
         elif username in users and pwd == users[username]:
             st.session_state["auth_ok"] = True
             st.session_state["current_user"] = username
             st.session_state.pop("login_pwd", None)
-            write_log(username, "LOGIN", "Basarili giris")
+            write_log(username, "LOGIN", "Successful login")
             st.rerun()
         else:
             st.error("❌ Incorrect username or password.")
-            write_log(username or "?", "LOGIN_FAIL", "Hatali giris denemesi")
+            write_log(username or "?", "LOGIN_FAIL", "Failed login attempt")
     return False
 
 if not check_login():
@@ -192,7 +217,7 @@ def float_input(label, key, default=""):
     try:
         return float(val.replace(",", ".").strip())
     except ValueError:
-        st.warning(f"⚠️ '{label}' alanina gecersiz sayi girildi, 0.0 kullanildi.")
+        st.warning(f"⚠️ Invalid number entered in '{label}', using 0.0 instead.")
         return 0.0
 
 # Sayisal girisler
@@ -283,18 +308,26 @@ with st.form("banking_form"):
 if submitted:
     # Basit zorunlu alan kontrolu
     if not z_number.strip() or not manager.strip():
-        st.error("❌ Lutfen 'Z Number' ve 'Manager' alanlarini doldurun.")
+        st.error("❌ Please fill in the 'Z Number' and 'Manager' fields.")
         st.stop()
 
     # === CIFT GONDERIM KORUMASI ===
-    # Bu kaydin benzersiz bir imzasini cikar. Ayni imza daha once gonderildiyse tekrar yazma.
-    submission_signature = f"{date_str}|{z_number}|{calculated_taken_in:.2f}|{cash_in_hand:.2f}"
-    if st.session_state.get("last_submission") == submission_signature:
-        st.warning("⚠️ Already submitted. Amend fields to resubmit.")
+    # 1) Anlik kilit: islem suruyorsa ikinci basisi hemen reddet.
+    if st.session_state.get("submitting"):
+        st.warning("⏳ Previous submission is still processing, please wait.")
         st.stop()
 
+    # 2) Imza kontrolu: ayni veri daha once basariyla gonderildiyse tekrar yazma.
+    submission_signature = f"{date_str}|{z_number}|{calculated_taken_in:.2f}|{cash_in_hand:.2f}"
+    if st.session_state.get("last_submission") == submission_signature:
+        st.warning("⚠️ This record appears to have already been submitted. Change a field if you want to submit again.")
+        st.stop()
+
+    # Kilidi hemen koy
+    st.session_state["submitting"] = True
+
     try:
-        with st.spinner("Sending... please wait..."):
+        with st.spinner("Submitting, please wait..."):
             creds = ServiceAccountCredentials.from_json_keyfile_dict(
                 json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
                 scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
@@ -308,7 +341,7 @@ if submitted:
             # Ayni tarih icin tekrar kayit engeli (gunde 1 kayit yeterli).
             # Bu, sayfa yenilense bile calisir cunku dogrudan sheet'e bakar.
             if date_exists_in_sheet(banking_sheet, date_str):
-                st.error(f"⚠️ {date_str} tarihi icin zaten bir kayit var. Cift kayit engellendi.")
+                st.error(f"⚠️ A record already exists for {date_str}. Duplicate entry blocked.")
                 st.stop()
 
             # Drive upload (hata yonetimli)
@@ -338,7 +371,7 @@ if submitted:
 
                         photo_links.append(f"https://drive.google.com/file/d/{uploaded['id']}/view")
                     except Exception as e:
-                        st.warning(f"⚠️ '{file.name}' yuklenemedi: {e}")
+                        st.warning(f"⚠️ '{file.name}' could not be uploaded: {e}")
 
             images = (photo_links + [""] * 6)[:6]
 
@@ -389,8 +422,8 @@ if submitted:
             except Exception as e:
                 # Ana satir yazildi ama ozet yazilamadi -> yarim kayit uyarisi
                 st.warning(
-                    "⚠️ Ana kayit yazildi ancak ozet sayfaya yazilamadi. "
-                    f"Lutfen ozet sayfayi elle kontrol edin. Detay: {e}"
+                    "⚠️ The main record was saved but the summary sheet could not be updated. "
+                    f"Please check the summary sheet manually. Details: {e}"
                 )
                 write_log(current_user, "SUMMARY_FAIL", f"Date={date_str}, Z={z_number}")
 
@@ -407,8 +440,11 @@ if submitted:
         st.session_state["form_submitted"] = True
 
     except Exception as e:
-        st.error(f"❌ Gonderim sirasinda hata olustu, kayit tamamlanmadi: {e}")
-        write_log(current_user, "SUBMIT_FAIL", f"Date={date_str}, Z={z_number}, Hata={e}")
+        st.error(f"❌ An error occurred during submission, the record was not completed: {e}")
+        write_log(current_user, "SUBMIT_FAIL", f"Date={date_str}, Z={z_number}, Error={e}")
+    finally:
+        # Kilidi her durumda ac (basarili da olsa hatali da olsa)
+        st.session_state["submitting"] = False
 
 # Basari mesaji
 if st.session_state.get("form_submitted"):
