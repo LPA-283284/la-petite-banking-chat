@@ -294,7 +294,7 @@ if submitted:
         st.stop()
 
     try:
-        with st.spinner("Gonderiliyor, lutfen bekleyin..."):
+        with st.spinner("Sending... please wait..."):
             creds = ServiceAccountCredentials.from_json_keyfile_dict(
                 json.loads(st.secrets["GOOGLE_SHEETS_CREDENTIALS"]),
                 scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
