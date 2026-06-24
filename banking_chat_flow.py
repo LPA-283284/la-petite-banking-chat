@@ -290,7 +290,7 @@ if submitted:
     # Bu kaydin benzersiz bir imzasini cikar. Ayni imza daha once gonderildiyse tekrar yazma.
     submission_signature = f"{date_str}|{z_number}|{calculated_taken_in:.2f}|{cash_in_hand:.2f}"
     if st.session_state.get("last_submission") == submission_signature:
-        st.warning("⚠️ Bu kayit zaten gonderilmis gorunuyor. Tekrar gondermek istiyorsan alanlari degistir.")
+        st.warning("⚠️ Already submitted. Amend fields to resubmit.")
         st.stop()
 
     try:
