@@ -302,7 +302,8 @@ uploaded_files = st.file_uploader("📷 Upload Receipts or Photos", type=["jpg",
 with st.form("banking_form"):
     deposit_details = st.text_area("Deposit Details Name Date In/Out")
     petty_cash_note = st.text_area("Petty Cash / Advance Details")
-    manager = st.text_input("Manager")
+    # Manager: giris yapan kullanicinin ismi otomatik gelir, gerekirse degistirilebilir.
+    manager = st.text_input("Manager", value=current_user if current_user != "?" else "")
     submitted = st.form_submit_button("Submit")
 
 if submitted:
